@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Viability Analysis</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/crop.css">
+    <script type="text/javascript" src="/eel.js"></script>
+    <script src="./js/index.js"></script>
+    <script src="./js/crop.js"></script>
+
+    <!-- Include other scripts and stylesheets as needed -->
+</head>
+<body class="app">
+    <div class="sidebar" id="sidebar">
+        <div href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</div>
+        <div id="HomeNav" onclick="showSection('home');">Home</div>
+        <div id="ImageNav" onclick="showSection('import');">Import</div>
+    </div>
+    <button class="openbtn" onclick="openNav()">☰ </button>  
+    <div class="main-content contentSection" id="home"></div>
+    <div class="main-content contentSection" id="import" style="display: none;"></div>
+    
+    </body>
+</body>
+</html>
