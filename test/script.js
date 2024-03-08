@@ -1,29 +1,3 @@
-function openNav() {
-    document.getElementById("sidebar").style.width = "150px";
-    for (var i = 0; i < document.getElementsByClassName("main-content").length; i++) {
-        document.getElementsByClassName("main-content")[i].style.marginLeft = "150px";
-    }
-    document.getElementsByClassName("openbtn").style.display = "none";
-}
-
-function closeNav() {
-    document.getElementById("sidebar").style.width = "0";
-    for (var i = 0; i < document.getElementsByClassName("main-content").length; i++) {
-        document.getElementsByClassName("main-content")[i].style.marginLeft = "0px";
-    }
-    document.getElementsByClassName("openbtn").style.display = "block";
-}
-
-function showSection(sectionId) {
-    var sections = document.querySelectorAll('.contentSection');
-    sections.forEach(function(section) {
-        section.style.display = 'none';
-    });
-    
-    document.getElementById(sectionId).style.display = 'flex';
-}
-
-
 document.addEventListener('DOMContentLoaded', () => {
     const dropZone = document.getElementById('dropZone');
     const preview = document.getElementById('preview');

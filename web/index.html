@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Viability Analysis</title>
     <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/crop.css">
+    <link rel="stylesheet" href="./css/cropper.min.css">
     <script type="text/javascript" src="/eel.js"></script>
     <script src="./js/index.js"></script>
-    <script src="./js/crop.js"></script>
+    <script src="./js/cropper.min.js"></script>
+    <script src="./js/script.js"></script>
+
 
     <!-- Include other scripts and stylesheets as needed -->
 </head>
@@ -17,11 +19,39 @@
         <div href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</div>
         <div id="HomeNav" onclick="showSection('home');">Home</div>
         <div id="ImageNav" onclick="showSection('import');">Import</div>
+        <div id="CropNav" onclick="showSection('crop');">Crop</div>
     </div>
     <button class="openbtn" onclick="openNav()">☰ </button>  
-    <div class="main-content contentSection" id="home"></div>
-    <div class="main-content contentSection" id="import" style="display: none;"></div>
-    
-    </body>
+    <div class="main-content contentSection" id="home">
+        <div class="section">
+            <h2>Dynamic Viability Analysis</h2>
+            <p>Click on the hamburger menu/bar icon to open the sidebar, and push this content to the right.</p>
+        </div>
+    </div>
+
+    <div class="main-content contentSection" id="crop" style="display: none;">
+        <div class="section">
+            <div class="container">
+                <div>
+                    <img id="image" src="" alt="Image" style="display: none;">
+                </div>
+                <div class="buttonContainer">
+                    <input type="file" id="file" accept="image/*">
+                    <button id="crop" onclick="cropImage()">Crop</button>
+                    <button id="upload" onclick="uploadImage()">Upload</button>
+                </div>
+                <img src=""  id="output">
+
+
+            </div>
+        </div>
+    </div>
+    <div class="main-content contentSection page" id="import" style="display: none;">
+        <div id="dropZone" class="drop-zone">Drag and drop images here</div>
+        <div id="preview" class="preview"></div>
+
+
+    </div>
+
 </body>
 </html>
