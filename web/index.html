@@ -17,40 +17,75 @@
 <body class="app">
     <div class="sidebar" id="sidebar">
         <div href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</div>
-        <div id="HomeNav" onclick="showSection('home');">Home</div>
-        <div id="ImageNav" onclick="showSection('import');">Import</div>
-        <div id="CropNav" onclick="showSection('crop');">Crop</div>
+        <div class="navContainer">
+            <div id="HomeNav" onclick="showSection('home');">Home</div>
+            <div id="ImageNav" onclick="showSection('import');">Import</div>
+            <div id="CropNav" onclick="showSection('crop');">Crop</div>
+        </div>
+        <div style="display: flex; align-items:center ; justify-content: center;"> 
+            <div id="HelpNav" onclick="showSection('help');">
+                <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier"> 
+                        <path d="M12 17H12.01M12 14C12.8906 12.0938 15 12.2344 15 10C15 8.5 14 7 12 7C10.4521 7 9.50325 7.89844 9.15332 9M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                    </g>
+                </svg>   
+            </div>
+        </div>
     </div>
-    <button class="openbtn" onclick="openNav()">☰ </button>  
-    <div class="main-content contentSection" id="home">
+    <div class="openbtn" onclick="openNav()">☰ </div>  
+    <div class="page" id="home">
         <div class="section">
             <h2>Dynamic Viability Analysis</h2>
             <p>Click on the hamburger menu/bar icon to open the sidebar, and push this content to the right.</p>
         </div>
     </div>
-
-    <div class="main-content contentSection" id="crop" style="display: none;">
+    <div class="page" id="crop" style="display: none;">
         <div class="section">
-            <div class="container">
-                <div>
-                    <img id="image" src="" alt="Image" style="display: none;">
+            <div class="buttonContainer">
+                <div class="button normal" id="uploadButton" onclick="uploadImage()">Upload</div>
+                <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 24 24" fill="none">
+                        <path d="M11.5 20.5C6.80558 20.5 3 16.6944 3 12C3 7.30558 6.80558 3.5 11.5 3.5C16.1944 3.5 20 7.30558 20 12C20 13.5433 19.5887 14.9905 18.8698 16.238M22.5 15L18.8698 16.238M17.1747 12.3832L18.5289 16.3542L18.8698 16.238" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </div>
-                <div class="buttonContainer">
-                    <input type="file" id="file" accept="image/*">
-                    <button id="crop" onclick="cropImage()">Crop</button>
-                    <button id="upload" onclick="uploadImage()">Upload</button>
+                <div class="button small" id="cropButton" onclick="cropImage()">
+                    <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" transform="matrix(1, 0, 0, 1, 0, 0)">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrier"> 
+                            <path d="M6 3V14.8C6 15.9201 6 16.4802 6.21799 16.908C6.40973 17.2843 6.71569 17.5903 7.09202 17.782C7.51984 18 8.0799 18 9.2 18H15M21 18H18M18 21V9.2C18 8.0799 18 7.51984 17.782 7.09202C17.5903 6.71569 17.2843 6.40973 16.908 6.21799C16.4802 6 15.9201 6 14.8 6H9M3 6H6M7 17L21 3" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                        </g>
+                    </svg>
                 </div>
-                <img src=""  id="output">
-
-
+                <div class="button small" id="saveButton" onclick="saveImage()">
+                    <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrier"> 
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6ZM8.25 6.75V16.6838L12 14.4615L15.75 16.6838V6.75H8.25Z" fill="#ffffff"></path> 
+                        </g>
+                    </svg>    
+                </div>
+                <div class="button small" id ="resetButton" onclick="cancelCrop()">
+                    <svg fill="#ffffff" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrier">
+                            <path d="M7.004 23.087l7.08-7.081-7.07-7.071L8.929 7.02l7.067 7.069L23.084 7l1.912 1.913-7.089 7.093 7.075 7.077-1.912 1.913-7.074-7.073L8.917 25z"></path>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            <div class="imageContainer">
+                <img id="image" src="" alt="Picture" style="display: none;">
             </div>
         </div>
     </div>
-    <div class="main-content contentSection page" id="import" style="display: none;">
+    <div class="page" id="import" style="display: none;">
         <div id="dropZone" class="drop-zone">Drag and drop images here</div>
         <div id="preview" class="preview"></div>
-
-
     </div>
 
 </body>

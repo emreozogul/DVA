@@ -1,21 +1,21 @@
 function openNav() {
     document.getElementById("sidebar").style.width = "150px";
-    for (var i = 0; i < document.getElementsByClassName("main-content").length; i++) {
-        document.getElementsByClassName("main-content")[i].style.marginLeft = "150px";
+    for (var i = 0; i < document.getElementsByClassName("page").length; i++) {
+        document.getElementsByClassName("page")[i].style.marginLeft = "150px";
     }
     document.getElementsByClassName("openbtn").style.display = "none";
 }
 
 function closeNav() {
     document.getElementById("sidebar").style.width = "0";
-    for (var i = 0; i < document.getElementsByClassName("main-content").length; i++) {
-        document.getElementsByClassName("main-content")[i].style.marginLeft = "0px";
+    for (var i = 0; i < document.getElementsByClassName("page").length; i++) {
+        document.getElementsByClassName("page")[i].style.marginLeft = "0px";
     }
     document.getElementsByClassName("openbtn").style.display = "block";
 }
 
 function showSection(sectionId) {
-    var sections = document.querySelectorAll('.contentSection');
+    var sections = document.querySelectorAll('.page');
     sections.forEach(function(section) {
         section.style.display = 'none';
     });

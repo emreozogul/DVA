@@ -1,34 +1,43 @@
-/* style.css */
+/* global */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-.app {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
-
 body {
     font-family: "Lato", sans-serif;
 }
 
+img {
+    display: block;
+  
+    /* This rule is very important, please don't ignore this */
+    max-width: 100%;
+}
+/* containers  */
+
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+} 
 .page {
     display: flex;
     flex: 1;
+    flex-direction: column;
+    transition: margin-left .5s;
+    margin-left: 0;
     padding: 20px;
-
 }
 
 .section {
     display: flex;
     flex-direction: column;
     flex: 1;
-    margin: 0 20px;
 }
 
+/* sidebar */
 .sidebar {
     height: 100%;
     width: 0;
@@ -56,6 +65,23 @@ body {
 .sidebar div:hover {
     color: #f1f1f1;
 }
+.sidebar .navContainer {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+}
+
+.sidebar .navContainer:hover {
+    color: #f1f1f1;
+}
+
 
 .sidebar .closebtn {
     position: absolute;
@@ -65,10 +91,7 @@ body {
     margin-left: 50px;
 }
 
-.main-content {
-    transition: margin-left .5s;
-    padding: 16px;
-}
+/* component styles with class names */
 
 .openbtn {
     font-size: 20px;
@@ -92,50 +115,48 @@ body {
     background-color: #444;
 }
 
-img {
-    display: block;
-  
-    /* This rule is very important, please don't ignore this */
-    max-width: 100%;
-  }
+/* crop page */
 
-  .buttonContainer {
+.buttonContainer {
+    width: 100%;
     display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+.buttonContainer .button {
+    display: flex;
+    align-items: center;
     justify-content: center;
-    margin-top: 20px;
-  }
-
-  .buttonContainer button {
-    padding: 10px 20px;
-    margin: 0 10px;
+    cursor: pointer;
+    background-color: #111;
+    color: white;
     border: none;
     border-radius: 4px;
-    cursor: pointer;
-  }
+    
+}
+.buttonContainer .button:hover {
+    background-color: #444;
+}
+.small {
+    font-size: 20px;
+    height: 40px;
+    width: 40px;
+}
+.normal {
+    font-size: 20px;
+    height: 40px;
+    padding: 4px 8px;
+}
+.large {
+    font-size: 20px;
+    height: 40px;
+    padding: 8px 16px;
+}
+.imageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
 
-    .buttonContainer button:hover {
-        background-color: #f2f2f2;
-    }
-
-    .buttonContainer button:active {
-        background-color: #e6e6e6;
-    }
-    .drop-zone {
-        width: 100%;
-        height: 300px;
-        border: 2px dashed #000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        margin: 20px;
-      }
-
-      .preview img {
-        width: 100px;
-        height: auto;
-        margin: 10px;
-      }
-      
-      
-      
