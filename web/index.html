@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Viability Analysis</title>
     <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/cropper.min.css">
     <script type="text/javascript" src="/eel.js"></script>
     <script src="./js/index.js"></script>
-    <script src="./js/cropper.min.js"></script>
     <script src="./js/script.js"></script>
-
-
     <!-- Include other scripts and stylesheets as needed -->
 </head>
 <body class="app">
@@ -42,57 +38,83 @@
         </div>
     </div>
     <div class="page" id="import" style="display: none;">
-        <div class="buttonContainer">
-            <div  style="display: flex ; flex-direction:row; gap: 4px;">
-                <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
-                    1
-                </div>
-                <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
-                    2
-                </div>
-                <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
-                    3
+        <div id="importPage1" class="section" >
+            <div class="buttonContainer">
+                <div  style="flex: 1 ; width:100%"></div>
+                <div  style="display: flex ; flex-direction:row; gap: 4px;">
+                    <div class="button normal" id="rotateLeftButton" onclick="nextPageImport()">
+                        <span>Next</span>
+                        <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier"> 
+                                <g id="Arrow / Chevron_Right_MD"> 
+                                    <path id="Vector" d="M10 8L14 12L10 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                                </g> 
+                            </g>
+                    </svg>
+                    </div>
                 </div>
             </div>
-            <div style="display: flex ; flex-direction:row; gap: 4px;">
-                <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 24 24" fill="none">
-                        <path d="M11.5 20.5C6.80558 20.5 3 16.6944 3 12C3 7.30558 6.80558 3.5 11.5 3.5C16.1944 3.5 20 7.30558 20 12C20 13.5433 19.5887 14.9905 18.8698 16.238M22.5 15L18.8698 16.238M17.1747 12.3832L18.5289 16.3542L18.8698 16.238" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+
+        </div>
+        <div id="importPage2" class="section" style="display: none;">
+             <div class="buttonContainer">
+                <div  style="display: flex ; flex-direction:row; gap: 4px;">
+                    <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
+                        1
+                    </div>
+                    <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
+                        2
+                    </div>
+                    <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
+                        3
+                    </div>
                 </div>
-                <div class="button small" id="cropButton" onclick="cropImage()">
-                    <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" transform="matrix(1, 0, 0, 1, 0, 0)">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier"> 
-                            <path d="M6 3V14.8C6 15.9201 6 16.4802 6.21799 16.908C6.40973 17.2843 6.71569 17.5903 7.09202 17.782C7.51984 18 8.0799 18 9.2 18H15M21 18H18M18 21V9.2C18 8.0799 18 7.51984 17.782 7.09202C17.5903 6.71569 17.2843 6.40973 16.908 6.21799C16.4802 6 15.9201 6 14.8 6H9M3 6H6M7 17L21 3" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
-                        </g>
-                    </svg>
+                <div style="display: flex ; flex-direction:row; gap: 4px;">
+                    <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 24 24" fill="none">
+                            <path d="M11.5 20.5C6.80558 20.5 3 16.6944 3 12C3 7.30558 6.80558 3.5 11.5 3.5C16.1944 3.5 20 7.30558 20 12C20 13.5433 19.5887 14.9905 18.8698 16.238M22.5 15L18.8698 16.238M17.1747 12.3832L18.5289 16.3542L18.8698 16.238" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="button small" id="cropButton" onclick="cropImage()">
+                        <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" transform="matrix(1, 0, 0, 1, 0, 0)">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier"> 
+                                <path d="M6 3V14.8C6 15.9201 6 16.4802 6.21799 16.908C6.40973 17.2843 6.71569 17.5903 7.09202 17.782C7.51984 18 8.0799 18 9.2 18H15M21 18H18M18 21V9.2C18 8.0799 18 7.51984 17.782 7.09202C17.5903 6.71569 17.2843 6.40973 16.908 6.21799C16.4802 6 15.9201 6 14.8 6H9M3 6H6M7 17L21 3" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="button small" id="saveButton" onclick="saveImage()">
+                        <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier"> 
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6ZM8.25 6.75V16.6838L12 14.4615L15.75 16.6838V6.75H8.25Z" fill="#ffffff"></path> 
+                            </g>
+                        </svg>    
+                    </div>
+                    <div class="button small" id ="resetButton" onclick="cancelCrop()">
+                        <svg fill="#ffffff" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path d="M7.004 23.087l7.08-7.081-7.07-7.071L8.929 7.02l7.067 7.069L23.084 7l1.912 1.913-7.089 7.093 7.075 7.077-1.912 1.913-7.074-7.073L8.917 25z"></path>
+                            </g>
+                        </svg>
+                    </div>
                 </div>
-                <div class="button small" id="saveButton" onclick="saveImage()">
-                    <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier"> 
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6ZM8.25 6.75V16.6838L12 14.4615L15.75 16.6838V6.75H8.25Z" fill="#ffffff"></path> 
-                        </g>
-                    </svg>    
-                </div>
-                <div class="button small" id ="resetButton" onclick="cancelCrop()">
-                    <svg fill="#ffffff" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier">
-                            <path d="M7.004 23.087l7.08-7.081-7.07-7.071L8.929 7.02l7.067 7.069L23.084 7l1.912 1.913-7.089 7.093 7.075 7.077-1.912 1.913-7.074-7.073L8.917 25z"></path>
-                        </g>
-                    </svg>
+                <div class="button normal" id="rotateLeftButton" onclick="prevPageImport()">
+                    <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Arrow / Chevron_Right_MD"> <path id="Vector" d="M10 8L14 12L10 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
+                    <span>Prev</span>
                 </div>
             </div>
+            <div id="dropZone" class="drop-zone">
+                <span class="drop-zone-text"> Drag and drop images here </span>
+            </div>
+            <div id="preview" class="preview"></div>
         </div>
-        <div id="dropZone" class="drop-zone">
-            <span class="drop-zone-text"> Drag and drop images here </span>
-        </div>
-        <div id="preview" class="preview"></div>
     </div>
 
 </body>

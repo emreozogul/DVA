@@ -30,7 +30,10 @@ img {
     margin-left: 0;
     padding: 20px;
 }
-
+.section {
+    display: flex;
+    flex-direction: column;
+}
 
 /* sidebar */
 .sidebar {
@@ -120,7 +123,9 @@ img {
     gap: 4px;
     margin-bottom: 20px;
 }
-.buttonContainer div .button {
+
+
+.buttonContainer div .button , .buttonContainer .button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -131,7 +136,7 @@ img {
     border-radius: 4px;
     
 }
-.buttonContainer div .button:hover {
+.buttonContainer div .button:hover , .buttonContainer .button:hover {
     background-color: #444;
 }
 .small {
@@ -142,7 +147,8 @@ img {
 .normal {
     font-size: 20px;
     height: 40px;
-    padding: 4px 8px;
+    padding: 4px 16px;
+    
 }
 .large {
     font-size: 20px;

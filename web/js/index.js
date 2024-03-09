@@ -23,6 +23,14 @@ function showSection(sectionId) {
     document.getElementById(sectionId).style.display = 'flex';
 }
 
+function nextPageImport() {
+    document.getElementById('importPage1').style.display = 'none';
+    document.getElementById('importPage2').style.display = 'flex';
+}
+function prevPageImport() {
+  document.getElementById('importPage1').style.display = 'flex';
+  document.getElementById('importPage2').style.display = 'none';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const dropZone = document.getElementById('dropZone');
