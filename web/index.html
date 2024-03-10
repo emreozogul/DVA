@@ -4,19 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Viability Analysis</title>
+    <script src="./js/cropper.js" type="module"></script>
+    <link rel="stylesheet" href="./css/cropper.min.css">
+
     <link rel="stylesheet" href="./css/style.css">
+    <script src="./js/index.js" type="module" ></script>    
     <script type="text/javascript" src="/eel.js"></script>
-    <script src="./js/index.js"></script>
-    <script src="./js/script.js"></script>
     <!-- Include other scripts and stylesheets as needed -->
+
+    <script>
+        
+
+        function start() {
+          var width = this.offsetWidth;
+          var height = this.offsetHeight;
+          var cropper;
+    
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d').drawImage(
+            this,
+            0, 0, this.naturalWidth, this.naturalHeight,
+            0, 0, width, height
+          );
+          cropper = new Cropper(canvas);
+        }
+    
+        window.addEventListener('DOMContentLoaded', function () {
+          var canvas = document.getElementById('canvas');
+          var image = document.getElementById('image');
+    
+          if (image.complete) {
+            start.call(image);
+          } else {
+            image.onload = start;
+          }
+        });
+      </script>
 </head>
 <body class="app">
     <div class="sidebar" id="sidebar">
-        <div href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</div>
+        <div href="javascript:void(0)" id="closebtn" class="closebtn" >×</div>
         <div class="navContainer">
-            <div id="HomeNav" onclick="showSection('home');">Home</div>
-            <div id="ImageNav" onclick="showSection('import');">Import</div>
-            <div id="ProjectNav" onclick="showSection('project');">Project</div>
+            <div id="HomeNav"  class="navItem" data-section="Home" >Home</div>
+            <div id="ImageNav"  class="navItem" data-section="Import" >Import</div>
+            <div id="ProjectNav"  class="navItem" data-section="Project" >Project</div>
         </div>
         <div style="display: flex; align-items:center ; justify-content: center;"> 
             <div id="HelpNav" onclick="openModal('help');">
@@ -30,19 +62,19 @@
             </div>
         </div>
     </div>
-    <div class="openbtn" onclick="openNav()">☰ </div>  
-    <div class="page" id="home">
+    <div id="openbtn" class="openbtn" >☰ </div>  
+    <div class="page" id="Home">
         <div>
             <h2>Dynamic Viability Analysis</h2>
             <p>Click on the hamburger menu/bar icon to open the sidebar, and push this content to the right.</p>
         </div>
     </div>
-    <div class="page" id="import" style="display: none;">
+    <div class="page" id="Import" style="display: none;">
         <div id="importPage1" class="section" >
             <div class="buttonContainer">
                 <div  style="flex: 1 ; width:100%"></div>
                 <div  style="display: flex ; flex-direction:row; gap: 4px;">
-                    <div class="button normal" id="rotateLeftButton" onclick="nextPageImport()">
+                    <div class="button normal" id="nextBtnImport" >
                         <span>Next</span>
                         <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -56,6 +88,29 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="row">
+                <span> Name</span>
+                <input type="text"  id="projectName"/>
+            </div>
+            <div class="row">
+                <span>Project Name</span>
+                <input type="text" id="" />
+            </div>
+            <div class="row">
+                <div class="custom-select">
+                    <select>
+                      <option value="">Open this select menu</option>
+                      <option value="">GitHub</option>
+                      <option value="">Instagram</option>
+                      <option value="">Facebook</option>
+                      <option value="">LinkedIn</option>
+                      <option value="">Twitter</option>
+                      <option value="">Reddit</option>
+                    </select>
+                  </div>
+            </div>
+
 
         </div>
         <div id="importPage2" class="section" style="display: none;">
@@ -105,7 +160,7 @@
                         </svg>
                     </div>
                 </div>
-                <div class="button normal" id="rotateLeftButton" onclick="prevPageImport()">
+                <div class="button normal" id="prevBtnImport">
                     <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Arrow / Chevron_Right_MD"> <path id="Vector" d="M10 8L14 12L10 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
                     <span>Prev</span>
                 </div>
@@ -113,7 +168,12 @@
             <div id="dropZone" class="drop-zone">
                 <span class="drop-zone-text"> Drag and drop images here </span>
             </div>
-            <div id="preview" class="preview"></div>
+            <div style="display: flex; gap: 20px; align-items:center; justify-content:space-between;">
+                <div class="img-container">
+                    <canvas id="canvas"></canvas>
+                </div>
+                <div id="preview" class="preview"></div>
+            </div>
         </div>
     </div>
 

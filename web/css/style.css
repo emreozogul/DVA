@@ -8,6 +8,12 @@
 body {
     font-family: "Lato", sans-serif;
 }
+button,
+li,
+a {
+  all: unset;
+  box-sizing: border-box;
+}
 
 img {
     display: block;
@@ -179,3 +185,74 @@ img {
     font-size: 20px;
     color: #ccc;
 }
+
+.row {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    border-radius: 4px;
+}
+
+
+.custom-select {
+    min-width: 350px;
+    position: relative;
+  }
+  
+select{
+    appearance: none;
+    /*  safari  */
+    -webkit-appearance: none;
+    /*  other styles for aesthetics */
+    width: 100%;
+    font-size: 1.15rem;
+    padding: 0.675em 6em 0.675em 1em;
+    background-color: #fff;
+    border: 1px solid #caced1;
+    border-radius: 0.25rem;
+    color: #000;
+    cursor: pointer;
+}
+  
+.custom-select::before,
+.custom-select::after {
+    --size: 0.3rem;
+    content: "";
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+}
+  
+.custom-select::before {
+    border-left: var(--size) solid transparent;
+    border-right: var(--size) solid transparent;
+    border-bottom: var(--size) solid black;
+    top: 40%;
+}
+  
+.custom-select::after {
+    border-left: var(--size) solid transparent;
+    border-right: var(--size) solid transparent;
+    border-top: var(--size) solid black;
+    top: 55%;
+}
+
+.preview {
+    width: 100px ;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    border-radius: 4px;
+    overflow: auto;
+    white-space: nowrap;
+    gap: 4px;
+}
+
+.preview img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+
+  
