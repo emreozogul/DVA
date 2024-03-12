@@ -4,6 +4,7 @@ import csv
 from datetime import datetime
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
+import pandas as pd
 import os
 
 def calculate_features(contour, scale_factor_pixels_per_micrometer):
@@ -14,7 +15,7 @@ def calculate_features(contour, scale_factor_pixels_per_micrometer):
     diameter_mm = 2 * radius_pixels * (scale_factor_pixels_per_micrometer/1000)  # Convert diameter to mm
     return area_mm2, perimeter_mm, diameter_mm
 
-def write_features_to_csv_mm(features, image_names):
+def write_features_to_csv_mm(features, image_names, spheroid_image_dir, target_values=None):
     # Include a timestamp in the CSV file name to ensure uniqueness
     timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
     csv_file_name = f"{timestamp}_spheroid_features.csv"
@@ -22,17 +23,27 @@ def write_features_to_csv_mm(features, image_names):
     
     # Define the headers for the CSV file
     # TODO --> add target column name
-    fieldnames = ['Image_Name', 'Area_mm2', 'Perimeter_mm', 'Diameter_mm']
+    fieldnames = ['Image_Name', 'Area_mm2', 'Perimeter_mm', 'Diameter_mm', 'Target']
     
-    # Write to CSV
+  # Write to CSV
     with open(csv_file_path, mode='w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
-        for feature_set, image_name in zip(features, image_names):
-            for feature in feature_set:
-                writer.writerow({'Image_Name': image_name, 'Area_mm2': feature[0], 'Perimeter_mm': feature[1], 'Diameter_mm': feature[2]})
+        for i, feature_set in enumerate(features):
+            image_name = image_names[i]
+            for j, feature in enumerate(feature_set):
+                # If target_values is provided, use it; otherwise, leave 'Target' blank
+                target_value = target_values[i][j] if target_values and len(target_values) > i and len(target_values[i]) > j else ""
+                writer.writerow({
+                    'File_Name': image_name, 
+                    'Area_mm2': feature[0], 
+                    'Perimeter_mm': feature[1], 
+                    'Diameter_mm': feature[2], 
+                    'Target': target_value
+                })
     return csv_file_path
 
+   #--> Why add equalize_histogram function?
 def equalize_histogram(image):
     # LAB renk uzayına dönüştür
     lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
@@ -46,7 +57,7 @@ def equalize_histogram(image):
 
 
 # Load the calibration image
-calibration_path = "prework/assets/calibrations/4x_calibration.tif"
+calibration_path = "prework/assets/calibrations/10x_calibration.tif"
 calibration_image = cv2.imread(calibration_path, cv2.IMREAD_UNCHANGED)
 
 # Check if the image is loaded successfully
@@ -108,10 +119,10 @@ if not spheroid_images:
 # Convert images to grayscale and apply thresholding
 binary_images = []
 for img in spheroid_images:
-    # Histogram eşitleme uygula
+    #Apply histogram equalization
     img_eq = equalize_histogram(img)
-    
-    # Gri tonlamaya çevir ve eşikleme uygula
+
+    # Convert to grayscale and apply Gaussian Blur
     gray_img = cv2.cvtColor(img_eq, cv2.COLOR_BGR2GRAY)
     blurred_img = cv2.GaussianBlur(gray_img, (5, 5), 0)
     _, binary_img = cv2.threshold(blurred_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
@@ -126,10 +137,18 @@ spheroid_features_mm = [[calculate_features(cnt, scale_factor_micrometers_per_pi
 
 csv_file_path_mm = None
 
-# Ensure both lists have the same length and are not empty
+#Write the features to a CSV file
 if len(spheroid_features_mm) == len(image_names) and len(spheroid_features_mm) > 0:
-    # Write the features to a CSV file in the image directory
-    csv_file_path_mm = write_features_to_csv_mm(spheroid_features_mm, image_names)
+   
+    # when calling target_values it should be target_values [["1"],["0"],["1"],["0"]
+     csv_file_path_mm = write_features_to_csv_mm(spheroid_features_mm, image_names, spheroid_image_dir, target_values=None)
+     print(f"CSV file saved to: {csv_file_path_mm}")
+
+     # Read the CSV file and display the contents
+     df=pd.read_csv(csv_file_path_mm)
+
+     selected_columns = df[['Image_Name','Area_mm2', 'Perimeter_mm', 'Diameter_mm']]
+    
 else:
     print("Error: Length mismatch or empty list.")
 
