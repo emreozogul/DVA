@@ -2,18 +2,50 @@ import itertools
 import os
 import numpy as np
 import pandas as pd
-from sklearn.datasets import load_iris
+from sklearn.calibration import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import normalize
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.metrics import accuracy_score, confusion_matrix
 import matplotlib.pyplot as plt
 
-# Load the dataset 
-# This part will change: The data will come here from the .csv file created as a result of the image processing pipeline.
-iris = load_iris()
-X = iris.data
-y = iris.target
+
+# Takes the folder path as input and returns the path to the latest CSV file in that folder.
+def get_latest_csv_file(folder_path):
+    # Get a list of all files in the folder
+    files = os.listdir(folder_path)
+    
+    """ - Sample file names -
+    data_2024-03-12_134520.csv
+    2024-03-12_data_134520.csv
+    sales_data_2024-03-12_134520.csv
+    2024-03-12_sales_134520.csv
+    20240312_data_134520.csv """
+    
+    # Filter out only CSV files
+    csv_files = [file for file in files if file.endswith('.csv')]
+    
+    # Sort the CSV files based on their timestamps
+    sorted_files = sorted(csv_files, key=lambda x: os.path.getmtime(os.path.join(folder_path, x)), reverse=True)
+    
+    if sorted_files:
+        # Return the path to the latest CSV file
+        return os.path.join(folder_path, sorted_files[0])
+    else:
+        return None
+
+# Load the dataset
+# Sample later it will be deleted...
+df = pd.read_csv("prework/data/HR_Analytics.csv")
+X = df.drop(['Attrition', 'EmployeeCount', 'EmployeeNumber', 'Over18', 'StandardHours'], axis=1)
+y = df['Attrition']
+column_names = X.columns.tolist()
+label_encoder = LabelEncoder()
+for column in column_names:
+    if X[column].dtype == 'object':
+        X[column] = label_encoder.fit_transform(X[column])
+y = label_encoder.fit_transform(y)
+
 
 """ 
 folder_path = 'prework/data'
@@ -22,7 +54,11 @@ if latest_csv_file:
     print("Latest CSV file: " + latest_csv_file)
     df = pd.read_csv(latest_csv_file)
 else:
-    print("No CSV files found in the folder.") """
+    print("No CSV files found in the folder.")
+    
+# Assign features (X) and target labels (y)
+X = df.iloc[:, 1:-1]  # Select all columns except the last one as features
+y = df.iloc[:, -1]   # Select the last column as the target """
 
 # Splitting the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=35)
@@ -41,7 +77,7 @@ accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy)
 
 # Feature importances
-feature_importances = pd.Series(clf.feature_importances_, index=iris.feature_names)
+feature_importances = pd.Series(clf.feature_importances_, index=X.columns)
 
 # Plotting feature importances as a bar chart
 plt.figure(figsize=(10, 6))
@@ -54,8 +90,10 @@ plt.show()
 
 # Visualizing the decision tree
 plt.figure(figsize=(12, 8))
-plot_tree(clf, filled=True, feature_names=iris.feature_names, class_names=iris.target_names)
+class_names = np.unique(y).astype(str)
+plot_tree(clf, filled=True, feature_names=X.columns, class_names=class_names)
 plt.show()
+
 
 # Confusion matrix
 conf_matrix = confusion_matrix(y_test, y_pred)
@@ -67,9 +105,9 @@ plt.figure(figsize=(8, 6))
 plt.imshow(conf_matrix, interpolation='nearest', cmap=plt.cm.Blues)
 plt.title('Confusion Matrix')
 plt.colorbar()
-tick_marks = np.arange(len(iris.target_names))
-plt.xticks(tick_marks, iris.target_names)
-plt.yticks(tick_marks, iris.target_names)
+tick_marks = np.arange(len(np.unique(y)))
+plt.xticks(tick_marks, np.unique(y))
+plt.yticks(tick_marks, np.unique(y))
 
 fmt = '.2f' if normalize else 'd'
 thresh = conf_matrix.max() / 2.
@@ -82,29 +120,3 @@ plt.ylabel('True label')
 plt.xlabel('Predicted label')
 plt.tight_layout()
 plt.show()
-
-
-
-# Takes the folder path as input and returns the path to the latest CSV file in that folder.
-def get_latest_csv_file(folder_path):
-    # Get a list of all files in the folder
-    files = os.listdir(folder_path)
-    
-    # - Sample file names -
-    # data_2024-03-12.csv
-    # 2024-03-12_data.csv
-    # sales_data_2024-03-12.csv
-    # 2024-03-12_sales.csv
-    # 20240312_data.csv
-    
-    # Filter out only CSV files
-    csv_files = [file for file in files if file.endswith('.csv')]
-    
-    # Sort the CSV files based on their timestamps
-    sorted_files = sorted(csv_files, key=lambda x: os.path.getmtime(os.path.join(folder_path, x)), reverse=True)
-    
-    if sorted_files:
-        # Return the path to the latest CSV file
-        return os.path.join(folder_path, sorted_files[0])
-    else:
-        return None
