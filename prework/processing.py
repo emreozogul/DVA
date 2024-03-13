@@ -35,7 +35,7 @@ def write_features_to_csv_mm(features, image_names, spheroid_image_dir, target_v
                 # If target_values is provided, use it; otherwise, leave 'Target' blank
                 target_value = target_values[i][j] if target_values and len(target_values) > i and len(target_values[i]) > j else ""
                 writer.writerow({
-                    'File_Name': image_name, 
+                    'Image_Name': image_name, 
                     'Area_mm2': feature[0], 
                     'Perimeter_mm': feature[1], 
                     'Diameter_mm': feature[2], 
@@ -43,21 +43,9 @@ def write_features_to_csv_mm(features, image_names, spheroid_image_dir, target_v
                 })
     return csv_file_path
 
-   #--> Why add equalize_histogram function?
-def equalize_histogram(image):
-    # LAB renk uzayına dönüştür
-    lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
-    l, a, b = cv2.split(lab)
-    # Histogram eşitleme uygula
-    l_eq = cv2.equalizeHist(l)
-    limg = cv2.merge((l_eq, a, b))
-    # Sonuçları BGR renk uzayına geri dönüştür
-    final = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
-    return final
-
 
 # Load the calibration image
-calibration_path = "prework/assets/calibrations/10x_calibration.tif"
+calibration_path = "prework/assets/calibrations/4x_calibration.tif"
 calibration_image = cv2.imread(calibration_path, cv2.IMREAD_UNCHANGED)
 
 # Check if the image is loaded successfully
@@ -119,11 +107,9 @@ if not spheroid_images:
 # Convert images to grayscale and apply thresholding
 binary_images = []
 for img in spheroid_images:
-    #Apply histogram equalization
-    img_eq = equalize_histogram(img)
 
     # Convert to grayscale and apply Gaussian Blur
-    gray_img = cv2.cvtColor(img_eq, cv2.COLOR_BGR2GRAY)
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blurred_img = cv2.GaussianBlur(gray_img, (5, 5), 0)
     _, binary_img = cv2.threshold(blurred_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     binary_images.append(binary_img)
