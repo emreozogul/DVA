@@ -15,13 +15,6 @@ def get_latest_csv_file(folder_path):
     # Get a list of all files in the folder
     files = os.listdir(folder_path)
     
-    """ - Sample file names -
-    data_2024-03-12_134520.csv
-    2024-03-12_data_134520.csv
-    sales_data_2024-03-12_134520.csv
-    2024-03-12_sales_134520.csv
-    20240312_data_134520.csv """
-    
     # Filter out only CSV files
     csv_files = [file for file in files if file.endswith('.csv')]
     
