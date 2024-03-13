@@ -22,25 +22,22 @@ def write_features_to_csv_mm(features, image_names, spheroid_image_dir, target_v
     csv_file_path = os.path.join("prework", "data", csv_file_name)
     
     # Define the headers for the CSV file
-    # TODO --> add target column name
     fieldnames = ['Image_Name', 'Area_mm2', 'Perimeter_mm', 'Diameter_mm', 'Target']
     
-  # Write to CSV
+    # Write to CSV
     with open(csv_file_path, mode='w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         for i, feature_set in enumerate(features):
             image_name = image_names[i]
-            for j, feature in enumerate(feature_set):
-                # If target_values is provided, use it; otherwise, leave 'Target' blank
-                target_value = target_values[i][j] if target_values and len(target_values) > i and len(target_values[i]) > j else ""
+            max_area_feature = max(feature_set, key=lambda x: x[0]) if feature_set else None  # Select contour with maximum area
+            if max_area_feature:
                 writer.writerow({
                     'Image_Name': image_name, 
-                    'Area_mm2': feature[0], 
-                    'Perimeter_mm': feature[1], 
-                    'Diameter_mm': feature[2], 
-                    # 'Target': target_value
-                    'Target': 1
+                    'Area_mm2': max_area_feature[0], 
+                    'Perimeter_mm': max_area_feature[1], 
+                    'Diameter_mm': max_area_feature[2], 
+                    'Target': 1  # Set your target value here
                 })
     return csv_file_path
 
@@ -121,10 +118,12 @@ spheroid_contours = [[cnt for cnt in contours if cv2.contourArea(cnt) > 100] for
 
 # Calculate the features for each spheroid using the new scale factor
 spheroid_features_mm = [[calculate_features(cnt, scale_factor_micrometers_per_pixel) for cnt in contours] for contours in spheroid_contours]
+spheroid_features_mm = list(spheroid_features_mm)
+
 
 csv_file_path_mm = None
 
-#Write the features to a CSV file
+# Write the features to a CSV file
 if len(spheroid_features_mm) == len(image_names) and len(spheroid_features_mm) > 0:
    
     # when calling target_values it should be target_values [["1"],["0"],["1"],["0"]
