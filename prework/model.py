@@ -35,19 +35,6 @@ def get_latest_csv_file(folder_path):
         return None
 
 # Load the dataset
-# Sample later it will be deleted...
-df = pd.read_csv("prework/data/HR_Analytics.csv")
-X = df.drop(['Attrition', 'EmployeeCount', 'EmployeeNumber', 'Over18', 'StandardHours'], axis=1)
-y = df['Attrition']
-column_names = X.columns.tolist()
-label_encoder = LabelEncoder()
-for column in column_names:
-    if X[column].dtype == 'object':
-        X[column] = label_encoder.fit_transform(X[column])
-y = label_encoder.fit_transform(y)
-
-
-""" 
 folder_path = 'prework/data'
 latest_csv_file = get_latest_csv_file(folder_path)
 if latest_csv_file:
@@ -58,7 +45,7 @@ else:
     
 # Assign features (X) and target labels (y)
 X = df.iloc[:, 1:-1]  # Select all columns except the last one as features
-y = df.iloc[:, -1]   # Select the last column as the target """
+y = df.iloc[:, -1]   # Select the last column as the target
 
 # Splitting the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=35)

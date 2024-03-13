@@ -39,7 +39,8 @@ def write_features_to_csv_mm(features, image_names, spheroid_image_dir, target_v
                     'Area_mm2': feature[0], 
                     'Perimeter_mm': feature[1], 
                     'Diameter_mm': feature[2], 
-                    'Target': target_value
+                    # 'Target': target_value
+                    'Target': 1
                 })
     return csv_file_path
 
