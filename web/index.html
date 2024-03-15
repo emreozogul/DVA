@@ -5,42 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Viability Analysis</title>
     <script src="./js/cropper.js" type="module"></script>
-    <link rel="stylesheet" href="./css/cropper.min.css">
+    <link rel="stylesheet" href="./css/cropper.css">
+    <script type="text/javascript" src="/eel.js"></script>
+
 
     <link rel="stylesheet" href="./css/style.css">
-    <script src="./js/index.js" type="module" ></script>    
-    <script type="text/javascript" src="/eel.js"></script>
+    <script src="./js/index.js" type="module"  ></script>    
     <!-- Include other scripts and stylesheets as needed -->
 
-    <script>
-        
-
-        function start() {
-          var width = this.offsetWidth;
-          var height = this.offsetHeight;
-          var cropper;
-    
-          canvas.width = width;
-          canvas.height = height;
-          canvas.getContext('2d').drawImage(
-            this,
-            0, 0, this.naturalWidth, this.naturalHeight,
-            0, 0, width, height
-          );
-          cropper = new Cropper(canvas);
-        }
-    
-        window.addEventListener('DOMContentLoaded', function () {
-          var canvas = document.getElementById('canvas');
-          var image = document.getElementById('image');
-    
-          if (image.complete) {
-            start.call(image);
-          } else {
-            image.onload = start;
-          }
-        });
-      </script>
 </head>
 <body class="app">
     <div class="sidebar" id="sidebar">
@@ -90,41 +62,38 @@
             </div>
             
             <div class="row">
-                <span> Name</span>
+                <p> Author</p>
                 <input type="text"  id="projectName"/>
             </div>
             <div class="row">
-                <span>Project Name</span>
+                <p>Project Name</p>
                 <input type="text" id="" />
             </div>
             <div class="row">
+                <p>Project Name</p>
                 <div class="custom-select">
                     <select>
-                      <option value="">Open this select menu</option>
-                      <option value="">GitHub</option>
-                      <option value="">Instagram</option>
-                      <option value="">Facebook</option>
-                      <option value="">LinkedIn</option>
-                      <option value="">Twitter</option>
-                      <option value="">Reddit</option>
+                      <option value="">Select project</option>
                     </select>
-                  </div>
+                </div>
             </div>
 
 
         </div>
         <div id="importPage2" class="section" style="display: none;">
              <div class="buttonContainer">
-                <div  style="display: flex ; flex-direction:row; gap: 4px;">
-                    <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
+                <div  style="display: flex ; flex-direction:row; gap: 4px;" id="importButtons">
+                    <input type="file" id="imageInput"  accept="image/*" style="opacity: 0; position: absolute; top: 0; left: 0;  cursor: pointer;"/>
+
+                    <div  class="button small importButton" id="1">
                         1
                     </div>
-                    <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
+                    <div class="button small importButton"  id="2">
                         2
                     </div>
-                    <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
+                    <div class="button small importButton" id="3">
                         3
-                    </div>
+                    </div>                 
                 </div>
                 <div style="display: flex ; flex-direction:row; gap: 4px;">
                     <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
@@ -160,22 +129,90 @@
                         </svg>
                     </div>
                 </div>
-                <div class="button normal" id="prevBtnImport">
-                    <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Arrow / Chevron_Right_MD"> <path id="Vector" d="M10 8L14 12L10 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
-                    <span>Prev</span>
+                <div style="display: flex ; flex-direction:row; gap: 4px;">
+                    <div class="button normal" id="prevBtnImport">
+                        <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Arrow / Chevron_Right_MD"> <path id="Vector" d="M10 8L14 12L10 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
+                        <span>Prev</span>
+                    </div>
+                    <div class="button normal" id="nextBtnImport2" >
+                        <span>Next</span>
+                        <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier"> 
+                                <g id="Arrow / Chevron_Right_MD"> 
+                                    <path id="Vector" d="M10 8L14 12L10 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                                </g> 
+                            </g>
+                    </svg>
+                    </div>
                 </div>
-            </div>
-            <div id="dropZone" class="drop-zone">
-                <span class="drop-zone-text"> Drag and drop images here </span>
             </div>
             <div style="display: flex; gap: 20px; align-items:center; justify-content:space-between;">
                 <div class="img-container">
-                    <canvas id="canvas"></canvas>
+                    <img id="image" src="" alt="Picture">
                 </div>
-                <div id="preview" class="preview"></div>
             </div>
         </div>
-    </div>
+        <div id="importPage3" class="section" style="display: none;">
+            <div class="buttonContainer">
+                <div  style="flex: 1 ; width:100%"></div>
+                <div  style="display: flex ; flex-direction:row; gap: 4px;">
+                    <div class="button normal" id="prevBtnImport2">
+                        <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Arrow / Chevron_Right_MD"> <path id="Vector" d="M10 8L14 12L10 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
+                        <span>Prev</span>
+                    </div>
+                </div>
+            </div>
+            
 
+
+        </div>
+    </div>
+    <div class="page" id="Project" style="display: none;">
+        <div id="projectPage1" class="section" >
+            <div class="buttonContainer">
+                <div  style="flex: 1 ; width:100%"></div>
+                <div  style="display: flex ; flex-direction:row; gap: 4px;">
+                    <div class="button normal" id="sNewProjectBtn" >
+                        <span>Add new project</span>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <ul class="project-list" id="projects">
+
+                </ul>
+            </div>
+            
+        </div>
+        <div id="projectPage2" class="section" style="display: none;">
+            <div class="buttonContainer">
+                <div  style="flex: 1 ; width:100%"></div>
+                <div  style="display: flex ; flex-direction:row; gap: 4px;">
+                    <div class="button normal" id="sProjectListBtn">
+                        <span>Project List</span>
+                    </div>
+                </div>
+            </div>
+            <form id="addProjectForm">
+                <div class="row">
+                    <p> Author</p>
+                    <input type="text"  id="authorAdd"/>
+                </div>
+                <div class="row">
+                    <p>Project Name</p>
+                    <input type="text" id="projectNameAdd" />
+                </div>
+                <button type="submit" class="button normal" id="addProject" >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                    </svg>
+                    <span>Add Project</span>
+                </button>
+            </form>
+        </div>
+    </div>
+    
 </body>
 </html>
