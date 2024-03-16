@@ -1,12 +1,14 @@
 source /path/to/your/virtualenv/bin/activate
-pip install numpy pandas scikit-learn matplotlib opencv-python
+pip install numpy pandas scikit-learn matplotlib opencv-python eel
 
 Batch'de bunları çalıştırmanız lazım. 
 şu kısım bende şuna karşılık geliyor: /path/to/your/virtualenv/ -> /Users/emreevcin/dev/projects/feng498/DVA/.venv
 
 ona göre çıkarım yaparsınız...
 
-
+!!!
+ModuleNotFoundError: No module named 'bottle.ext.websocket'
+pip install git+https://github.com/bottlepy/bottle.git
 
 TO_DO:
 - image processing pipeline güncellenmesi lazım.

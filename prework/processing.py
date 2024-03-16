@@ -163,9 +163,9 @@ model_py_path = "prework/model.py"
 
 if os.path.isfile(model_py_path):
 
-    # Run the Model.py file
+    # Run the model.py file
     try:
-        print("Running the Model.py file...")
+        print("Running the model.py file...")
         subprocess.run([python_path, model_py_path, csv_file_path_mm], check=True)
         print("model.py file executed successfully.")
     except subprocess.CalledProcessError as e:

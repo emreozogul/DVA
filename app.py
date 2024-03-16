@@ -1,3 +1,5 @@
+import subprocess
+import sys
 import eel
 import os
 import sqlite3
@@ -43,11 +45,20 @@ def check_project_name(project_name):
     else:
         return False
 
-    
-    
+# This function will be assigned to an input in js  
+@eel.expose
+def run_processing_and_model():
+    python_path = sys.executable
+    processing_py_path = "prework/processing.py"
+    try:
+        # Run the processing.py file
+        print("Running the processing.py file...")
+        subprocess.run([python_path, processing_py_path], check=True)
+        print("processing.py file executed successfully.")
+    except subprocess.CalledProcessError as e:
+        print("An error occurred while running the processing.py file:", e)
+        raise    
     
 if __name__ == '__main__':
     eel.init('web')  # Give folder containing web files
     eel.start('index.html', size=(1000, 800) )    # Start
-    
-    
