@@ -1,3 +1,5 @@
+import subprocess
+import sys
 import cv2
 import numpy as np
 import csv
@@ -155,3 +157,19 @@ for i, (original_img, binary_img) in enumerate(zip(spheroid_images, binary_image
     
     plt.show()
 
+# Section to run the model.py file
+python_path = sys.executable
+model_py_path = "prework/model.py"
+
+if os.path.isfile(model_py_path):
+
+    # Run the Model.py file
+    try:
+        print("Running the Model.py file...")
+        subprocess.run([python_path, model_py_path, csv_file_path_mm], check=True)
+        print("model.py file executed successfully.")
+    except subprocess.CalledProcessError as e:
+        print("An error occurred while running the model.py file:", e)
+        raise
+else:
+    print("Model.py file not found.")
