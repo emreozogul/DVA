@@ -1,27 +1,28 @@
+from database.db import DatabaseSingleton
+from database.operations import DatabaseOperations
 import subprocess
 import sys
 import eel
 import os
-import sqlite3
-
 
 # Initialize database connection
-conn = sqlite3.connect('con.db')
+db = DatabaseSingleton()
+conn = db.get_connection()
 c = conn.cursor()
 
-# Create table
-c.execute('''CREATE TABLE IF NOT EXISTS projects (id INTEGER PRIMARY KEY, name TEXT, author TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
-conn.commit()
+# Initialize database operations
+ops = DatabaseOperations(db)
+
 
 @eel.expose
-def add_project(name, author):
-    c.execute('INSERT INTO projects (name, author) VALUES (?, ?)', (name, author))
+def add_project(name, owner):
+    ops.create_project(name=name, owner=owner)
     conn.commit()
     return "Project added successfully!"
 
 @eel.expose
 def get_projects():
-    c.execute('SELECT * FROM projects ORDER BY created_at DESC')
+    ops.read_projects()
     return c.fetchall()
 
 
