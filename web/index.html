@@ -4,14 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Viability Analysis</title>
+    <script src="./js/jquery.js"></script>
     <script src="./js/cropper.js" type="module"></script>
     <link rel="stylesheet" href="./css/cropper.css">
     <script type="text/javascript" src="/eel.js"></script>
 
 
     <link rel="stylesheet" href="./css/style.css">
-    <script src="./js/index.js" type="module"  ></script>    
+    <script src="./js/index.js" ></script>    
     <!-- Include other scripts and stylesheets as needed -->
+    <style>
+        .container {
+          margin: 20px auto;
+          max-width: 640px;
+        }
+        img {
+          max-width: 100%;
+          display: block; /* Initially hide the image */
+        }
+      </style>
+    <script>
+        var cropper;
+        window.addEventListener('DOMContentLoaded', function () {
+            var image = document.getElementById('image');
+            var fileInput = document.getElementById('fileInput');
+            var button = document.getElementById("cropButton");
+            var saveButton = document.getElementById("saveButton");
+            saveButton.addEventListener('click', function () {
+                sendImageToProcess();
+            });
+            
+            
+
+    
+            fileInput.onchange = function (e) {
+            var files = e.target.files;
+            var reader = new FileReader();
+            reader.onload = function (e) {
+              image.src = e.target.result;
+              image.style.display = 'block'; // Show the image
+    
+              if (cropper) {
+                cropper.destroy(); // Destroy the old cropper instance
+              }
+
+              button.onclick = function () {
+                cropper = new Cropper(image, {
+                    aspectRatio: 1 / 1,
+                    background: false,
+                    highlight: false,
+                    zoomable: false,
+                    zoomOnTouch: false,
+                    zoomOnWheel: false,
+                  });
+                };
+            };
+            if (files && files.length > 0) {
+              reader.readAsDataURL(files[0]);
+              console.log(files[0]);
+            }
+          };
+        });
+
+        function getPathToFile() {
+            eel.pythonFunction()(r => console.log(r));
+        };
+    </script>
 
 </head>
 <body class="app">
@@ -39,6 +97,15 @@
         <div>
             <h2>Dynamic Viability Analysis</h2>
             <p>Click on the hamburger menu/bar icon to open the sidebar, and push this content to the right.</p>
+            <div class="container">
+                <h1>Crop on canvas with Cropper</h1>
+                <button onclick="triggerFileSelectionAndProcessing()">Select and Process Image</button>
+                <img id="processedImage" src="" alt="Processed Image will appear here." />
+                <h3>Image</h3>
+                <div class="img-container">
+                  <img id="image" src="" alt="Picture" id="imageDisplay" >
+                </div>
+            </div>
         </div>
     </div>
     <div class="page" id="Import" style="display: none;">
@@ -83,8 +150,6 @@
         <div id="importPage2" class="section" style="display: none;">
              <div class="buttonContainer">
                 <div  style="display: flex ; flex-direction:row; gap: 4px;" id="importButtons">
-                    <input type="file" id="imageInput"  accept="image/*" style="opacity: 0; position: absolute; top: 0; left: 0;  cursor: pointer;"/>
-
                     <div  class="button small importButton" id="1">
                         1
                     </div>

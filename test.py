@@ -11,4 +11,4 @@ def process_cropped_image(image_data):
     image.save('cropped_image.png')
     print("Image has been saved.")
 
-eel.start('index.html', size=(800, 600))
+eel.start('index.html', size=(800, 600) , port=8080)

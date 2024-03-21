@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+
   const nextBtnImport = document.getElementById('nextBtnImport');
   nextBtnImport.addEventListener('click', nextPageImport);
 
@@ -98,61 +99,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     event.preventDefault();
     addProject();
   });
-  var image = document.getElementById('image');
-  var canvas = document.getElementById('canvas');
-  var cropper;
-
-
-  var buttons = document.querySelectorAll('.importButton');
-  buttons.forEach((button) => {
-    button.addEventListener('click', function (event) {
-      console.log(event.target.id);
-      document.getElementById('imageInput').click();
-      var files = event.target.files;
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        image.src = e.target.result;
-        image.style.display = 'block'; // Show the image
-
-        if (cropper) {
-          cropper.destroy(); // Destroy the old cropper instance
-        }
-        image.onload = function () {
-          cropper = new Cropper(image, {
-            aspectRatio: 1 / 1,
-            background: false,
-            highlight: false,
-            zoomable: false,
-            zoomOnTouch: false,
-            zoomOnWheel: false,
-            ready: function () {
-              var width = image.offsetWidth;
-              var height = image.offsetHeight;
-
-              canvas.width = width;
-              canvas.height = height;
-              canvas.getContext('2d').clearRect(0, 0, width, height);
-              canvas.getContext('2d').drawImage(
-                image,
-                0, 0, image.naturalWidth, image.naturalHeight,
-                0, 0, width, height
-              );
-            }
-          }
-          );
-        };
-      };
-      if (files && files.length > 0) {
-        reader.readAsDataURL(files[0]);
-      }
-    });
-  });
-
-
 
 
 });
 
+function triggerFileSelectionAndProcessing() {
+  eel.select_and_process_image()(function (resultPath) {
+    if (resultPath) {
+      console.log('Image processed and saved to:', resultPath);
+      // You can now display the processed image or inform the user
+      // For example, update the 'src' of an img tag to show the processed image
+      document.getElementById('processedImage').src = resultPath;
+    } else {
+      console.log('No image was selected.');
+    }
+  });
+}
+
+
+function uploadImage() {
+  var input = document.getElementById('x');
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      // Send the image data to Python
+      eel.process_image(e.target.result)(function (res) {
+        console.log(res); // Log the response from Python
+      });
+    }
+
+    reader.readAsDataURL(input.files[0]);
+  }
+}
 
 // project
 

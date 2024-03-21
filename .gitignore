@@ -7,3 +7,5 @@ web/.DS_Store
 con.db
 .idea/workspace.xml
 .DS_Store
+/database/__pycache__
+/prework/__pycache__
