@@ -28,15 +28,6 @@ function prevPageImport() {
   document.getElementById('importPage1').style.display = 'flex';
   document.getElementById('importPage2').style.display = 'none';
 }
-function nextPageImport2() {
-  document.getElementById('importPage2').style.display = 'none';
-  document.getElementById('importPage3').style.display = 'flex';
-}
-
-function prevPageImport2() {
-  document.getElementById('importPage2').style.display = 'flex';
-  document.getElementById('importPage3').style.display = 'none';
-}
 
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -82,11 +73,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const prevBtnImport = document.getElementById('prevBtnImport');
   prevBtnImport.addEventListener('click', prevPageImport);
 
-  const nextBtnImport2 = document.getElementById('nextBtnImport2');
-  nextBtnImport2.addEventListener('click', nextPageImport2);
-
-  const prevBtnImport2 = document.getElementById('prevBtnImport2');
-  prevBtnImport2.addEventListener('click', prevPageImport2);
 
   const sNewProjectBtn = document.getElementById('sNewProjectBtn');
   sNewProjectBtn.addEventListener('click', showAddScreenProject);
