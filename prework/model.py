@@ -28,7 +28,7 @@ def get_latest_csv_file(folder_path):
         return None
 
 # Load the dataset
-folder_path = 'prework/data'
+folder_path = os.path.join('prework', 'data')
 latest_csv_file = get_latest_csv_file(folder_path)
 if latest_csv_file:
     print("Latest CSV file: " + latest_csv_file)

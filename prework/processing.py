@@ -45,7 +45,7 @@ def write_features_to_csv_mm(features, image_names, spheroid_image_dir, target_v
 
 
 # Load the calibration image
-calibration_path = "prework/assets/calibrations/4x_calibration.tif"
+calibration_path = os.path.join('prework', 'assets', 'calibrations', '4x_calibration.tif')
 calibration_image = cv2.imread(calibration_path, cv2.IMREAD_UNCHANGED)
 
 # Check if the image is loaded successfully
@@ -83,7 +83,7 @@ sorted_peaks = np.sort(peaks)[:2]
 distance_pixels = np.diff(sorted_peaks)[0]
 scale_factor_micrometers_per_pixel = 10 / distance_pixels  # 10 micrometers divided by distance in pixels
 
-spheroid_image_dir = "prework/assets/images"
+spheroid_image_dir = os.path.join('prework', 'assets', 'images')
 image_names = os.listdir(spheroid_image_dir)
 spheroid_images = []
 
@@ -159,7 +159,7 @@ for i, (original_img, binary_img) in enumerate(zip(spheroid_images, binary_image
 
 # Section to run the model.py file
 python_path = sys.executable
-model_py_path = "prework/model.py"
+model_py_path = os.path.join('prework', 'model.py')
 
 if os.path.isfile(model_py_path):
 
