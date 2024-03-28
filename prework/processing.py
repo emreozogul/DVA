@@ -8,13 +8,16 @@ import os
 import subprocess
 import sys
 
+# Calculate features 
 def calculate_features(contour, scale_factor):
+    # Calculate area in square millimeters.
     area_mm2 = cv2.contourArea(contour) * (scale_factor)**2
     perimeter_mm = cv2.arcLength(contour, True) * (scale_factor)
     (x, y), radius_pixels = cv2.minEnclosingCircle(contour)
     diameter_mm = 2 * radius_pixels * (scale_factor)
     return area_mm2, perimeter_mm, diameter_mm
 
+# Process an image to extract the largest contour and its features.
 def process_image(image_path, scale_factor):
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -27,11 +30,38 @@ def process_image(image_path, scale_factor):
     contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
+        # Draw the largest contour on the original image.
         contoured_image = cv2.drawContours(image.copy(), [largest_contour], -1, (0, 255, 0), 2)
-        return calculate_features(largest_contour, scale_factor), contoured_image # Değişiklik: binary yerine contoured_image döndürülüyor
+        return calculate_features(largest_contour, scale_factor), contoured_image 
     else:
         return None, None
+    
+def process_images_4x(image_dir):
+    image_paths = [os.path.join(image_dir, img) for img in os.listdir(image_dir) if img.endswith('.tif')]
+    images = [cv2.imread(path, cv2.IMREAD_GRAYSCALE) for path in image_paths]
 
+    low_threshold = 30
+    high_threshold = 100
+    scale_factor_4x = 0.0786 * 4 / 10  # Adjusted scale factor for 4x magnification
+
+    features_4x = []
+    contoured_images_4x = []  # To store contoured images
+
+    for image in images:
+        edge = cv2.Canny(image, low_threshold, high_threshold)
+        contours, _ = cv2.findContours(edge, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contoured_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        for contour in contours:
+            cv2.drawContours(contoured_image, [contour], -1, (0, 255, 0), 2)
+            area_mm2, perimeter_mm, diameter_mm = calculate_features(contour, scale_factor_4x)
+            features_4x.append((area_mm2, perimeter_mm, diameter_mm))
+        contoured_images_4x.append(contoured_image)
+
+    return features_4x, contoured_images_4x, [path.split(os.sep)[-1] for path in image_paths]
+
+
+
+# Write the calculated features of contours to a CSV file.
 def write_features_to_csv_mm(features, image_names, output_dir, target_values):
     timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
     csv_file_name = f"{timestamp}_spheroid_features.csv"
@@ -44,7 +74,7 @@ def write_features_to_csv_mm(features, image_names, output_dir, target_values):
         writer.writeheader()
         for i, feature in enumerate(features):
             image_name = image_names[i]
-            if feature[0]: # Değişiklik: Özellikler varsa
+            if feature[0]:
                 writer.writerow({
                     'Image_Name': image_name, 
                     'Area_mm2': feature[0][0],
@@ -54,33 +84,63 @@ def write_features_to_csv_mm(features, image_names, output_dir, target_values):
                 })
     return csv_file_path
 
+# Write the calculated features of contours to a CSV file for 4x.
+def write_features_to_csv_4x(features, image_names, output_dir, target_values_4x=None):
+
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+    csv_file_name = f"{timestamp}_4x_spheroid_features.csv"
+    csv_file_path = os.path.join(output_dir, csv_file_name)
+    fieldnames = ['Image_Name', 'Area_mm2', 'Perimeter_mm', 'Diameter_mm', 'Target']
+    
+    with open(csv_file_path, mode='w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        for feature, image_name in zip(features, image_names):
+            writer.writerow({
+                'Image_Name': image_name, 
+                'Area_mm2': feature[0],
+                'Perimeter_mm': feature[1], 
+                'Diameter_mm': feature[2],
+                'Target': target_values_4x[i] if target_values_4x and len(target_values_4x) > i else None
+            })
+    return csv_file_path
+
+
+# Set parameters for image processing.
 scale_factor = 0.0786
 spheroid_image_dir = 'prework/assets/images'
+spheroid_image_dir_4x = 'prework/assets/images4x'
 output_dir = 'prework/data'
 image_names = os.listdir(spheroid_image_dir)
 spheroid_features_mm = []
 
+# Process 4x images and write the features to a CSV file.
+features_4x, contoured_images_4x, image_names_4x = process_images_4x(spheroid_image_dir_4x)
+csv_file_path_4x = write_features_to_csv_4x(features_4x, image_names_4x, output_dir)
+print(f"4x features CSV file saved to: {csv_file_path_4x}")
+
+# Process each image and store the features in a list.
 for img_name in image_names:
     img_path = os.path.join(spheroid_image_dir, img_name)
-    features, contoured_image = process_image(img_path, scale_factor) # Değişiklik: binary_image yerine contoured_image
-    if features:
-        spheroid_features_mm.append((features, contoured_image)) # Değişiklik: contoured_image ekleniyor
+    features, contoured_image = process_image(img_path, scale_factor) 
+    spheroid_features_mm.append((features, contoured_image)) 
 
-target_values = ["1", "0", "1", "0"] # Örnek olarak, resim sayınıza uygun bir liste sağlayın
+target_values = ["1", "0", "1", "0"] 
+#target values for 4x images
+target_values_4x = ["1", "0", "1", "0"]
 
-# CSV dosyasını yazdırma kısmı
+# Write the features to a CSV file and display the results.
 csv_file_path_mm = None
 if len(spheroid_features_mm) == len(image_names) and spheroid_features_mm:
     csv_file_path_mm = write_features_to_csv_mm(spheroid_features_mm, image_names, output_dir, target_values)
     print(f"CSV file saved to: {csv_file_path_mm}")
 
-    # CSV dosyasını okuyup içeriğini gösterme
     df = pd.read_csv(csv_file_path_mm)
     print(df[['Image_Name', 'Area_mm2','Perimeter_mm', 'Diameter_mm', 'Target']])
 
 for i, (feature, contoured_image) in enumerate(spheroid_features_mm):
     img_name = image_names[i]
-    # Görüntüleri gösterme
+ 
     plt.figure(figsize=(12, 6))
     original_img = cv2.imread(os.path.join(spheroid_image_dir, img_name), cv2.IMREAD_UNCHANGED)
     
@@ -96,7 +156,24 @@ for i, (feature, contoured_image) in enumerate(spheroid_features_mm):
 
     plt.show()
 
-# model.py dosyasını çalıştırma bölümü
+#Show 4x images with contours drawn on them
+for i, contoured_image in enumerate(contoured_images_4x):
+    img_name = image_names_4x[i]
+    plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    plt.imshow(cv2.cvtColor(cv2.imread(os.path.join(spheroid_image_dir_4x, img_name), cv2.IMREAD_UNCHANGED), cv2.COLOR_BGR2RGB))
+    plt.title(f'Original Image - {img_name}')
+    plt.axis('off')
+
+    plt.subplot(1, 2, 2)
+    plt.imshow(cv2.cvtColor(contoured_image, cv2.COLOR_BGR2RGB))
+    plt.title('Processed Image')
+    plt.axis('off')
+
+    plt.show()
+    
+
+# Run the model.py file
 python_path = sys.executable
 model_py_path = os.path.join('prework', 'model.py')
 
@@ -109,4 +186,3 @@ if os.path.isfile(model_py_path):
         print(f"An error occurred while running the model.py file: {e}")
 else:
     print("Model.py file not found.")
-
