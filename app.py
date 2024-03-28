@@ -49,7 +49,7 @@ def create_new_folder(folder_name):
 def select_and_process_image():
     app = wx.App(None)
     style = wx.FD_OPEN | wx.FD_FILE_MUST_EXIST
-    dialog = wx.FileDialog(None, 'Open', wildcard="*.png;*.jpg;*.jpeg", style=style)
+    dialog = wx.FileDialog(None, 'Open', wildcard="*.png;*.jpg;*.jpeg;*.tif", style=style)
     if dialog.ShowModal() == wx.ID_OK:
         image_path = dialog.GetPath()
         # Process the image using the file path

@@ -87,6 +87,84 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
 
+  function updatePhaseUpload(phaseQuantity) {
+    const phaseUploadDiv = document.getElementById('phaseUpload');
+
+    // Clear existing content
+    phaseUploadDiv.innerHTML = '';
+
+    // Add new content based on phaseQuantity
+    if (phaseQuantity === '2') {
+      phaseUploadDiv.innerHTML =
+        `
+      <div class="phase-image-upload-container" id="phaseContainer">
+        <div class="row" >
+          <div style="display:flex; flex:1 ; align-items:center; justify-content:space-between ;">
+            <p style="padding:6px ; font-weight: bold; font-size:20px ; color:#555555;">Upload Images</p>
+            <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.264">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier"> 
+                <path d="M16.19 2H7.81C4.17 2 2 4.17 2 7.81V16.18C2 19.83 4.17 22 7.81 22H16.18C19.82 22 21.99 19.83 21.99 16.19V7.81C22 4.17 19.83 2 16.19 2ZM17.53 7.53L9.81 15.25H12.83C13.24 15.25 13.58 15.59 13.58 16C13.58 16.41 13.24 16.75 12.83 16.75H8C7.59 16.75 7.25 16.41 7.25 16V11.17C7.25 10.76 7.59 10.42 8 10.42C8.41 10.42 8.75 10.76 8.75 11.17V14.19L16.47 6.47C16.62 6.32 16.81 6.25 17 6.25C17.19 6.25 17.38 6.32 17.53 6.47C17.82 6.76 17.82 7.24 17.53 7.53Z" fill="#000000"></path> 
+              </g>
+            </svg>
+            
+          </div>
+        </div>
+        <div class="row" >
+          <div class="phase-image-upload-button" onclick="triggerFileSelectionAndProcessing()">Phase 1</div>
+          <p class="label" id="uploadedImageName"></p>
+        </div>
+        <div class="row" >
+          <div class="phase-image-upload-button" onclick="triggerFileSelectionAndProcessing()">Phase 2</div>
+          <p class="label" id="uploadedImageName"></p>
+        </div>
+      </div>
+        `;
+
+    } else if (phaseQuantity === '3') {
+      phaseUploadDiv.innerHTML =
+        `
+        <div class="phase-image-upload-container" id="phaseContainer">
+        <div class="row" >
+          <div style="display:flex; flex:1 ; align-items:center; justify-content:space-between ;">
+            <p style="padding:6px ; font-weight: bold; font-size:20px ; color:#555555;">Upload Images</p>
+            <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.264">
+              <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+              <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+              <g id="SVGRepo_iconCarrier"> 
+                <path d="M16.19 2H7.81C4.17 2 2 4.17 2 7.81V16.18C2 19.83 4.17 22 7.81 22H16.18C19.82 22 21.99 19.83 21.99 16.19V7.81C22 4.17 19.83 2 16.19 2ZM17.53 7.53L9.81 15.25H12.83C13.24 15.25 13.58 15.59 13.58 16C13.58 16.41 13.24 16.75 12.83 16.75H8C7.59 16.75 7.25 16.41 7.25 16V11.17C7.25 10.76 7.59 10.42 8 10.42C8.41 10.42 8.75 10.76 8.75 11.17V14.19L16.47 6.47C16.62 6.32 16.81 6.25 17 6.25C17.19 6.25 17.38 6.32 17.53 6.47C17.82 6.76 17.82 7.24 17.53 7.53Z" fill="#000000"></path> 
+              </g>
+            </svg>
+            
+          </div>
+        </div>
+        <div class="row" >
+          <div class="phase-image-upload-button" onclick="triggerFileSelectionAndProcessing()">Phase 1</div>
+          <p class="label" id="uploadedImageName1"></p>
+        </div>
+        <div class="row" >
+          <div class="phase-image-upload-button" onclick="triggerFileSelectionAndProcessing()">Phase 2</div>
+          <p class="label" id="uploadedImageName2"></p>
+        </div>
+        <div class="row">
+          <div class="phase-image-upload-button" onclick="triggerFileSelectionAndProcessing()">Phase 2</div>
+          <p class="label" id="uploadedImageName3"></p>
+        </div>
+      </div>
+        `;
+      ;
+    }
+  }
+
+  // Listen for changes on the radio buttons
+  document.querySelectorAll('.choicebox-container input[type="radio"][name="radio"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+      updatePhaseUpload(this.value);
+    });
+  });
+
+
 });
 
 function triggerFileSelectionAndProcessing() {
