@@ -21,6 +21,7 @@ function showSection(sectionId) {
 }
 // Import
 function nextPageImport() {
+
   document.getElementById('importPage1').style.display = 'none';
   document.getElementById('importPage2').style.display = 'flex';
 }
@@ -68,7 +69,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
   const nextBtnImport = document.getElementById('nextBtnImport');
-  nextBtnImport.addEventListener('click', nextPageImport);
+  nextBtnImport.addEventListener('click', function (event) {
+    var allImagesUploaded = checkPhaseImagesAreUploaded();
+
+    if (!allImagesUploaded) {
+      console.log('Not all images have been uploaded');
+      event.preventDefault();
+
+    } else {
+      nextPageImport();
+    }
+
+  });
 
   const prevBtnImport = document.getElementById('prevBtnImport');
   prevBtnImport.addEventListener('click', prevPageImport);
@@ -91,13 +103,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const phaseUploadDiv = document.getElementById('phaseUpload');
 
     // Clear existing content
-    phaseUploadDiv.innerHTML = '';
+    phaseUploadDiv.innerHTML = null;
 
     // Add new content based on phaseQuantity
     if (phaseQuantity === '2') {
       phaseUploadDiv.innerHTML =
-        `
-      <div class="phase-image-upload-container" id="phaseContainer">
+        `<div class="phase-image-upload-container" id="phaseContainer">
         <div class="row" >
           <div style="display:flex; flex:1 ; align-items:center; justify-content:space-between ;">
             <p style="padding:6px ; font-weight: bold; font-size:20px ; color:#555555;">Upload Images</p>
@@ -112,20 +123,27 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
         <div class="row" >
-          <div class="phase-image-upload-button" onclick="triggerFileSelectionAndProcessing()">Phase 1</div>
-          <p class="label" id="uploadedImageName"></p>
+          <div class="phase-image-upload-button" data-label-id="image-path-1">Phase 1</div>
+          <p class="label" id="image-path-1"></p>
         </div>
         <div class="row" >
-          <div class="phase-image-upload-button" onclick="triggerFileSelectionAndProcessing()">Phase 2</div>
-          <p class="label" id="uploadedImageName"></p>
+          <div class="phase-image-upload-button" data-label-id="image-path-2">Phase 2</div>
+          <p class="label" id="image-path-2"></p>
         </div>
-      </div>
-        `;
+      </div>`;
+
+      var buttons = phaseUploadDiv.getElementsByClassName("phase-image-upload-button");
+
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener('click', function (event) {
+          var labelId = event.target.getAttribute('data-label-id');
+          triggerImageSelection(labelId);
+        });
+      }
 
     } else if (phaseQuantity === '3') {
       phaseUploadDiv.innerHTML =
-        `
-        <div class="phase-image-upload-container" id="phaseContainer">
+        `<div class="phase-image-upload-container" id="phaseContainer">
         <div class="row" >
           <div style="display:flex; flex:1 ; align-items:center; justify-content:space-between ;">
             <p style="padding:6px ; font-weight: bold; font-size:20px ; color:#555555;">Upload Images</p>
@@ -140,20 +158,27 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
         <div class="row" >
-          <div class="phase-image-upload-button" onclick="triggerFileSelectionAndProcessing()">Phase 1</div>
-          <p class="label" id="uploadedImageName1"></p>
+          <div class="phase-image-upload-button" data-label-id="image-path-1">Phase 1</div>
+          <p class="label" id="image-path-1"></p>
         </div>
         <div class="row" >
-          <div class="phase-image-upload-button" onclick="triggerFileSelectionAndProcessing()">Phase 2</div>
-          <p class="label" id="uploadedImageName2"></p>
+          <div class="phase-image-upload-button" data-label-id="image-path-2" >Phase 2</div>
+          <p class="label" id="image-path-2"></p>
         </div>
-        <div class="row">
-          <div class="phase-image-upload-button" onclick="triggerFileSelectionAndProcessing()">Phase 2</div>
-          <p class="label" id="uploadedImageName3"></p>
+        <div class="row" >
+          <div class="phase-image-upload-button" data-label-id="image-path-3" >Phase 1</div>
+          <p class="label" id="image-path-3"></p>
         </div>
-      </div>
-        `;
-      ;
+      </div>`;
+
+      var buttons = phaseUploadDiv.getElementsByClassName("phase-image-upload-button");
+
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener('click', function (event) {
+          var labelId = event.target.getAttribute('data-label-id');
+          triggerImageSelection(labelId);
+        });
+      }
     }
   }
 
@@ -244,7 +269,6 @@ async function readProject() {
 
 }
 
-
 function showProjectList() {
   document.getElementById('projectPage1').style.display = 'flex';
   document.getElementById('projectPage2').style.display = 'none';
@@ -254,3 +278,50 @@ function showAddScreenProject() {
   document.getElementById('projectPage1').style.display = 'none';
   document.getElementById('projectPage2').style.display = 'flex';
 }
+
+function checkPhaseImagesAreUploaded() {
+  var phaseContainer = document.getElementById('phaseUpload');
+  // this holds the value of path of image <p class="label" id="uploadedImageName"></p>
+  console.log("checkPhaseImagesAreUploaded -> phaseContainer", phaseContainer)
+  if (phaseContainer.hasChildNodes()) {
+    var labels = phaseContainer.getElementsByClassName('label');
+    console.log("checkPhaseImagesAreUploaded -> labels", labels)
+
+    if (labels.length === 0) {
+      alert('Select the number of phases first.');
+      return false;
+    }
+    for (var i = 0; i < labels.length; i++) {
+      if (labels[i].textContent === '') {
+        alert('Please upload an image for phase ' + (i + 1));
+        return false;
+      }
+    }
+    return true;
+  }
+
+
+  return false;
+}
+
+
+function triggerImageSelection(labelId) {
+  // Get the label element by its id
+  var label = document.getElementById(labelId);
+
+  // Make sure the label element exists
+  if (!label) {
+    console.error('Label element not found:', labelId);
+    return;
+  }
+
+  eel.select_image()(function (result) {
+    if (result) {
+      console.log('File selected:', result);
+      label.textContent = result;
+    } else {
+      console.log('No file was selected.');
+    }
+  });
+}
+

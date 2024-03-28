@@ -59,6 +59,18 @@ def select_and_process_image():
     dialog.Destroy()
     return result_path
 
+
+@eel.expose
+def select_image():
+    app = wx.App(None)
+    style = wx.FD_OPEN | wx.FD_FILE_MUST_EXIST
+    dialog = wx.FileDialog(None, 'Open', wildcard="*.png;*.jpg;*.jpeg;*.tif", style=style)
+    if dialog.ShowModal() == wx.ID_OK:
+        image_path = dialog.GetPath()
+    else:
+        image_path = None
+    dialog.Destroy()
+    return image_path
  
 @eel.expose
 def check_project_name(project_name):
