@@ -33,55 +33,62 @@ def process_image(image_path, scale_factor):
         # Draw the largest contour on the original image.
         contoured_image = cv2.drawContours(image.copy(), [largest_contour], -1, (0, 255, 0), 2)
         area_mm2, perimeter_mm, diameter_mm = calculate_features(largest_contour, scale_factor)
-        particle_count = count_particles(image)
+        particle_count = refined_count_particles(image)
         return (area_mm2, perimeter_mm, diameter_mm, particle_count), contoured_image  
     else:
         return None, None
-   
+    
 def process_images_4x(image_dir, scale_factor_4x):
     image_paths = [os.path.join(image_dir, img) for img in os.listdir(image_dir) if img.endswith('.tif')]
     images = [cv2.imread(path, cv2.IMREAD_GRAYSCALE) for path in image_paths]
-
     low_threshold = 30
-    high_threshold = 100
+    high_threshold = 120
     features_4x = []
     contoured_images_4x = []  # To store contoured images
 
     for image in images:
         edge = cv2.Canny(image, low_threshold, high_threshold)
-        kernel = np.ones((3, 3), np.uint8)
+        kernel = np.ones((13, 13), np.uint8)
         closing = cv2.morphologyEx(edge, cv2.MORPH_CLOSE, kernel, iterations=3)
         contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        contoured_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-
-        # For particle counting, let's convert the image back to BGR, since count_particles expects a BGR image
-        # If the original color information is needed for accurate particle counting, adjustments might be needed
-        image_bgr = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-        particle_count = count_particles(image_bgr)
-
-        for contour in contours:
-            cv2.drawContours(contoured_image, [contour], -1, (0, 255, 0), 2)
-            area_mm2, perimeter_mm, diameter_mm = calculate_features(contour, scale_factor_4x)
+        
+        if contours:
+            largest_contour = max(contours, key=cv2.contourArea)
+            contoured_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+            cv2.drawContours(contoured_image, [largest_contour], -1, (0, 255, 0), 3)  # Draw the largest contour
+            
+            area_mm2, perimeter_mm, diameter_mm = calculate_features(largest_contour, scale_factor_4x)
+            # For particle counting, let's convert the image back to BGR, since count_particles expects a BGR image
+            image_bgr = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+            particle_count = refined_count_particles(image_bgr)
             features_4x.append((area_mm2, perimeter_mm, diameter_mm, particle_count))
-        contoured_images_4x.append(contoured_image)
+            contoured_images_4x.append(contoured_image)
+        else:
+            # Handle cases with no contours
+            features_4x.append((None, None, None, 0))
+            contoured_images_4x.append(cv2.cvtColor(image, cv2.COLOR_GRAY2BGR))
 
     return features_4x, contoured_images_4x, [path.split(os.sep)[-1] for path in image_paths]
 
 
 # Write the calculated features of contours to a CSV file.
-def count_particles(image, lower_thresh=100, upper_thresh=255, min_area=10, max_area=1000):
+def refined_count_particles(image, spheroid_contour=None, lower_thresh=100, upper_thresh=255, min_area=10, max_area=500):
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
     _, thresh_image = cv2.threshold(gray_image, lower_thresh, upper_thresh, cv2.THRESH_BINARY)
+    kernel = np.ones((3, 3), np.uint8)
+    opened_image = cv2.morphologyEx(thresh_image, cv2.MORPH_OPEN, kernel, iterations=2)
+    contours, _ = cv2.findContours(opened_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
-    contours, _ = cv2.findContours(thresh_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    # Filter contours based on area
     filtered_contours = [contour for contour in contours if min_area <= cv2.contourArea(contour) <= max_area]
     
-    # Count the filtered particles
-    particle_count = len(filtered_contours)
-    return particle_count
+    # Exclude contours within the spheroid area if spheroid_contour is provided
+    if spheroid_contour is not None:
+        moment = cv2.moments(spheroid_contour)
+        sx = int(moment["m10"] / moment["m00"])
+        sy = int(moment["m01"] / moment["m00"])
+        filtered_contours = [contour for contour in filtered_contours if cv2.pointPolygonTest(spheroid_contour, (sx, sy), False) < 0]
+    
+    return len(filtered_contours)
 
 def write_features_to_csv_mm(features, image_names, output_dir, target_values):
     timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
@@ -105,7 +112,6 @@ def write_features_to_csv_mm(features, image_names, output_dir, target_values):
                     'Target': target_values[i] if target_values and len(target_values) > i else None
                 })
     return csv_file_path
-
 
 # Write the calculated features of contours to a CSV file for 4x.
 def write_features_to_csv_4x(features, image_names, output_dir, target_values_4x=None):
@@ -150,9 +156,9 @@ for img_name in image_names:
     features, contoured_image = process_image(img_path, scale_factor) 
     spheroid_features_mm.append((features, contoured_image)) 
 
-target_values = ["1", "0", "1", "0"] 
+target_values = ["1", "0", "1", "0", "1", "0", "1", "0", "1", "0"] 
 #target values for 4x images
-target_values_4x = ["1", "0", "1", "0"]
+target_values_4x = ["1", "0", "1", "0", "1", "0", "1", "0", "1", "0"]
 
 # Write the features to a CSV file and display the results.
 csv_file_path_mm = None
