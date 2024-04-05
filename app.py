@@ -23,6 +23,7 @@ ops = DatabaseOperations(db)
 
 @eel.expose
 def add_project(name, owner):
+    print(f"Adding project: {name} - {owner}")
     ops.create_project(name=name, owner=owner)
     conn.commit()
     return "Project added successfully!"
@@ -97,4 +98,8 @@ def run_processing_and_model():
     
 if __name__ == '__main__':
     eel.init('web')  # Give folder containing web files
-    eel.start('index.html', size=(1000, 800) )    # Start
+    #set constaints for the window size min 500x500 and max 1000x800
+    eel.init('web', allowed_extensions=['.js', '.html', '.css'])
+    eel.start('index.html', size=(1000, 800), position=(100, 100))    # Start
+    conn.close()
+    

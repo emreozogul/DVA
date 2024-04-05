@@ -7,15 +7,8 @@
     <script src="./js/jquery.js"></script>
     <script src="./js/cropper.js" type="module"></script>
     <link rel="stylesheet" href="./css/cropper.css">
-    <link rel="stylesheet" href="./css/importPage.css">
-    <link rel="stylesheet" href="./css/projectPage.css">
-
     <script type="text/javascript" src="/eel.js"></script>
-
-
     <link rel="stylesheet" href="./css/style.css">
- 
-
     <script src="./js/index.js" ></script>    
     <!-- Include other scripts and stylesheets as needed -->
     <style>
@@ -36,7 +29,7 @@
     
             var cropper;
     
-            fileInput.onchange = function (e) {
+            /*fileInput.onchange = function (e) {
             var files = e.target.files;
             var reader = new FileReader();
             reader.onload = function (e) {
@@ -63,10 +56,20 @@
               console.log(files[0]);
             }
           };
+          */
         });
-      
-        
 
+        $(window).resize(function() {
+            var minWidth = 800;
+            var minHeight = 800;
+            var currentWidth = window.innerWidth;
+            var currentHeight = window.innerHeight;
+            var newWidth = currentWidth < minWidth ? minWidth : currentWidth;
+            var newHeight = currentHeight < minHeight ? minHeight : currentHeight;
+            if (newWidth !== currentWidth || newHeight !== currentHeight) {
+                window.resizeTo(newWidth, newHeight);
+            }
+        });
     </script>
 
 </head>
@@ -101,26 +104,9 @@
         </div>
     </div>
     <div class="page" id="Import" style="display: none;">
-        <div id="importPage1" class="section" >
-            <div class="buttonContainer">
-                <div  style="flex: 1 ; width:100%"></div>
-                <div  style="display: flex ; flex-direction:row; gap: 4px;">
-                    <div class="button normal" id="nextBtnImport" >
-                        <span>Next</span>
-                        <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                            <g id="SVGRepo_iconCarrier"> 
-                                <g id="Arrow / Chevron_Right_MD"> 
-                                    <path id="Vector" d="M10 8L14 12L10 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
-                                </g> 
-                            </g>
-                    </svg>
-                    </div>
-                </div>
-            </div>
+        <div id="importPageInput" class="section" >
             <div class="section-remaining">
-                <div class="importForm">
+                <div class="form">
                     <div class="row">
                         <p> Author</p>
                         <input type="text"  id="projectName"/>
@@ -158,18 +144,23 @@
                 <div class="" id="phaseUpload" >
 
                 </div>
+                <div style=" width: 100%;display: flex; align-items: center;justify-content: center;gap: 4px;margin-bottom: 20px;">
+                    <div class="button normal" id="submitBtnImport" >
+                        <span>Submit</span>
+                    </div>
+                </div>
             </div>
+            
 
 
         </div>
         
-        <div id="importPage2" class="section" style="display: none;">
+        <div id="importPageResult" class="section" style="display: none;">
             <div class="buttonContainer">
                 <div  style="flex: 1 ; width:100%"></div>
                 <div  style="display: flex ; flex-direction:row; gap: 4px;">
-                    <div class="button normal" id="prevBtnImport">
-                        <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="rotate(180)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Arrow / Chevron_Right_MD"> <path id="Vector" d="M10 8L14 12L10 16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
-                        <span>Prev</span>
+                    <div class="button small" id="prevBtnImport">
+                        <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8 5L3 10L8 15" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M3 10H11C16.5228 10 21 14.4772 21 20V21" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>                        
                     </div>
                 </div>
             </div>
@@ -204,7 +195,7 @@
                     </div>
                 </div>
             </div>
-            <form id="addProjectForm">
+            <form class="form" style="max-width: 600px;" id="addProjectForm"> 
                 <div class="row">
                     <p> Owner</p>
                     <input type="text"  id="authorAdd"/>
@@ -213,12 +204,16 @@
                     <p>Project Name</p>
                     <input type="text" id="projectNameAdd" />
                 </div>
-                <button type="submit" class="button normal" id="addProject" >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                        <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
-                    </svg>
+                <div class="row">
+                    <p>Description</p>
+                    <input type="text" id="descriptionAdd" />
+                </div>
+                <div class="buttonContainer" style="justify-content: end;">
+                <button type="submit" class="button normal" id="addProject" style="max-width: 200px;" >
+                    <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
                     <span>Add Project</span>
                 </button>
+                </div>
             </form>
         </div>
     </div>
@@ -260,7 +255,7 @@
             </div>
         </div>
         <div class="container">
-            <button onclick="triggerFileSelectionAndProcessing()">Select and Process Image</button>
+            <button class="button normal" onclick="triggerFileSelectionAndProcessing()">Select and Process Image</button>
             <div class="img-container">
               <img id="image" src="" alt="Picture">
             </div>

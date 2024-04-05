@@ -251,3 +251,198 @@ img {
 }
 
 /* project page */
+
+.project-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    background-color: #574f4f0f;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
+        -5px -5px 10px rgba(255, 255, 255, 0.5);
+}
+
+.project-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
+        -5px -5px 10px rgba(255, 255, 255, 0.5);
+}
+
+.project-list li .header {
+    display: flex;
+    width: 100%;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-list li .project-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.project-list li .project-owner {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.project-list li .project-description {
+    font-size: 1rem;
+}
+
+.separator {
+    width: 100%;
+    height: 1px;
+    background-color: #ccc;
+}
+
+.project-list li .footer {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    flex: 1;
+    width: 100%;
+}
+
+.project-list li .content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+/* import page */
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: #574f4f0f;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
+        -5px -5px 10px rgba(255, 255, 255, 0.5);
+}
+
+.form .row {
+    display: flex;
+    min-width: 500px;
+    max-width: 600px;
+    position: relative;
+    align-items: center;
+}
+
+.form .row input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.form .row input:focus {
+    outline: none;
+    border: 1px solid #000;
+}
+
+.form .row p {
+    color: #111;
+    width: 150px;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: large;
+    display: flex;
+    align-items: center;
+}
+
+.form .custom-select {
+    min-width: 350px;
+    position: relative;
+}
+
+.form .custom-select select {
+    appearance: none;
+    /*  safari  */
+    -webkit-appearance: none;
+    /*  other styles for aesthetics */
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 0.5em 4em 0.5em 1em;
+    background-color: #fff;
+    border: 1px solid #caced1;
+    border-radius: 0.25rem;
+    color: #000;
+    cursor: pointer;
+}
+
+.form .custom-select .custom-select::before,
+.form .custom-select .custom-select::after {
+    --size: 0.3rem;
+    content: "";
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+}
+
+.form .custom-select .custom-select::before {
+    border-left: var(--size) solid transparent;
+    border-right: var(--size) solid transparent;
+    border-bottom: var(--size) solid black;
+    top: 40%;
+}
+
+.form .custom-select .custom-select::after {
+    border-left: var(--size) solid transparent;
+    border-right: var(--size) solid transparent;
+    border-top: var(--size) solid black;
+    top: 55%;
+}
+
+
+.phase-image-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background-color: #574f4f0f;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
+        -5px -5px 10px rgba(255, 255, 255, 0.5);
+}
+
+.phase-image-upload-container .row {
+    display: flex;
+    min-width: 500px;
+    max-width: 600px;
+    position: relative;
+    align-items: center;
+}
+
+
+.phase-image-upload-container .row .phase-image-upload-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #111;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px;
+}
+
+.phase-image-upload-container .row .label {
+    color: #111;
+    width: 150px;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: large;
+    display: flex;
+    align-items: center;
+}
