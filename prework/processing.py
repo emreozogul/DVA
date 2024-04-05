@@ -9,12 +9,17 @@ import subprocess
 import sys
 
 # Calculate features 
+# Calculate features in millimeters using the scale factor
 def calculate_features(contour, scale_factor):
-    # Calculate area in square millimeters.
-    area_mm2 = cv2.contourArea(contour) * (scale_factor)**2
-    perimeter_mm = cv2.arcLength(contour, True) * (scale_factor)
-    (x, y), radius_pixels = cv2.minEnclosingCircle(contour)
-    diameter_mm = 2 * radius_pixels * (scale_factor)
+    area_pixels = cv2.contourArea(contour)  # Area in pixels
+    perimeter_pixels = cv2.arcLength(contour, True)  # Perimeter in pixels
+    (_, _), radius_pixels = cv2.minEnclosingCircle(contour)  # Radius in pixels
+
+    # Convert to millimeters
+    area_mm2 = area_pixels * scale_factor ** 2
+    perimeter_mm = perimeter_pixels * scale_factor
+    diameter_mm = 2 * radius_pixels * scale_factor
+
     return area_mm2, perimeter_mm, diameter_mm
 
 # Process an image to extract the largest contour and its features.
@@ -39,7 +44,7 @@ def process_image(image_path, scale_factor):
         return None, None
     
 def process_images_4x(image_dir, scale_factor_4x):
-    image_paths = [os.path.join(image_dir, img) for img in os.listdir(image_dir) if img.endswith('.tif')]
+    image_paths = [os.path.join(image_dir, img) for img in os.listdir(image_dir) if img.endswith(('.tif', '.jpg', '.png'))]
     images = [cv2.imread(path, cv2.IMREAD_GRAYSCALE) for path in image_paths]
     low_threshold = 30
     high_threshold = 120
@@ -138,7 +143,7 @@ def write_features_to_csv_4x(features, image_names, output_dir, target_values_4x
 
 # Set parameters for image processing.
 scale_factor = 0.0786
-scale_factor_4x = 0.0786 * 10 / 4
+scale_factor_4x = ((0.0786)*4)/10
 spheroid_image_dir = 'prework/assets/images'
 spheroid_image_dir_4x = 'prework/assets/images4x'
 output_dir = 'prework/data'
