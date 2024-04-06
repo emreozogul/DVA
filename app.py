@@ -22,17 +22,16 @@ ops = DatabaseOperations(db)
 
 
 @eel.expose
-def add_project(name, owner):
+def add_project(name, owner, desc):
     print(f"Adding project: {name} - {owner}")
-    ops.create_project(name=name, owner=owner)
+    ops.create_project(name=name, owner=owner , desc=desc)
     conn.commit()
-    return "Project added successfully!"
-
+    return "Project added successfully."
 @eel.expose
-def get_projects():
-    ops.read_projects()
-    return c.fetchall()
-
+def get_projects():   
+    projects = ops.read_projects()
+    simplified_projects = [{"id": project[0], "name": project[1], "owner": project[2], "description": project[3], "timestamp": project[4]} for project in projects]
+    return simplified_projects
 
 def create_folder(folder_path):
     if not os.path.exists(folder_path):
@@ -74,7 +73,7 @@ def select_image():
     return image_path
  
 @eel.expose
-def check_project_name(project_name):
+def check_project_exists(project_name):
     c.execute('SELECT * FROM projects WHERE name = ?', (project_name,))
     # check if the project name already exists
     if c.fetchone():
