@@ -8,10 +8,10 @@ class DatabaseOperations:
     def __exit__(self, exc_type, exc_value, traceback):
         self.db.close_connection()
 
-    def create_project(self, name, owner):
+    def create_project(self, name, owner, desc):
         conn = self.db.get_connection()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO projects (name, owner) VALUES (?, ?)", (name, owner))
+        cursor.execute("INSERT INTO projects (name, owner ,desc) VALUES (?, ?, ?)", (name, owner, desc))
         conn.commit()
 
     def read_projects(self):
@@ -23,7 +23,7 @@ class DatabaseOperations:
     def update_project(self, project_id, name, owner):
         conn = self.db.get_connection()
         cursor = conn.cursor()
-        cursor.execute("UPDATE projects SET name = ?, owner = ? WHERE id = ?", (name, owner, project_id))
+        cursor.execute("UPDATE projects SET name = ?, owner = ? , desc = ? WHERE id = ?", (name, owner, project_id))
         conn.commit()
 
     def delete_project(self, project_id):

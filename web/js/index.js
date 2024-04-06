@@ -30,27 +30,20 @@ function prevPageImport() {
   document.getElementById('importPage2').style.display = 'none';
 }
 
+async function loadProjects() {
+  let projectData = await eel.get_projects()();  // Note the double parentheses to invoke the function
+  return projectData;
+}
+var projects = [];
 
 
 document.addEventListener('DOMContentLoaded', async () => {
-  let projectData = await eel.get_projects();
-  console.log(projectData);
-  const projectList = document.getElementById('projects');
-
-
-
-  if (projectData.length > 0) {
-    projectData.forEach(project => {
-      const projectItem = document.createElement('li');
-      projectItem.textContent = project;
-      projectList.appendChild(projectItem);
-    });
-  } else {
-    const projectItem = document.createElement('p');
-    projectItem.textContent = "No projects exist.";
-    projectList.appendChild(projectItem);
+  projects = await loadProjects();
+  if (projects.length === 0) {
+    console.log('No projects found.');
   }
-
+  console.log('Projects:', projects);
+  updateProjectList();
 
   const openbtn = document.getElementById('openbtn');
   openbtn.addEventListener('click', openNav);
@@ -84,23 +77,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   });
 
-
-
   const prevBtnImport = document.getElementById('prevBtnImport');
   prevBtnImport.addEventListener('click', prevPageImport);
-
 
   const sNewProjectBtn = document.getElementById('sNewProjectBtn');
   sNewProjectBtn.addEventListener('click', showAddScreenProject);
 
   const sProjectListBtn = document.getElementById('sProjectListBtn');
   sProjectListBtn.addEventListener('click', showProjectList);
-
-  const addProjectForm = document.getElementById('addProjectForm');
-  addProjectForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-    addProject();
-  });
 
 
   function updatePhaseUpload(phaseQuantity) {
@@ -193,10 +177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-
-  var projects = [];
-
-  document.getElementById('addProjectForm').addEventListener('submit', function (event) {
+  document.getElementById('addProjectForm').addEventListener('submit', async function (event) {
     // Prevent the form from submitting normally
     event.preventDefault();
 
@@ -205,55 +186,66 @@ document.addEventListener('DOMContentLoaded', async () => {
     var projectName = document.getElementById('projectNameAdd').value;
     var description = document.getElementById('descriptionAdd').value;
 
+
+    let response = await eel.check_project_exists(projectName)();
+    if (response) {
+      alert('Project already exists.');
+      return;
+    }
     // Create a new project
     var newProject = {
       owner: owner,
       projectName: projectName,
       description: description,
-      // make like 06/01/2021 12:00 PM which means discard seconds from the date
       createdAt: new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     };
 
-    // Add the new project to your projects array
+    await eel.add_project(owner, projectName, description)();
     projects.push(newProject);
 
-    // Update the project list in the import page
     updateProjectList();
-
-    // Clear the input fields
     document.getElementById('authorAdd').value = '';
     document.getElementById('projectNameAdd').value = '';
+    document.getElementById('descriptionAdd').value = '';
+    showProjectList();
   });
 
   function updateProjectList() {
-    // Get the project list element
+    // Get the project list element<
     var projectList = document.getElementById('projects');
 
+    if (!projectList) {
+      console.error('The "projects" element does not exist.');
+      return;  // Exit the function if the element doesn't exist
+    }
     // Clear the project list
     projectList.innerHTML = '';
 
+
     // Add each project to the project list
     for (var i = 0; i < projects.length; i++) {
+      console.log(projects[i]);
       // Create a new list item element for the project with project name title and owner as text and createdAt as text
       var projectItem = document.createElement('li');
       projectItem.innerHTML =
         `<div class="header">
-        <p class="project-name">${projects[i].projectName}</p>
-        <p class="project-owner">${projects[i].owner}</p>
-      </div>
-      <div class="separator"></div>
-      <div class="content">
-        <p class="project-description">${projects[i].description}</p>
-      </div>
-      <div class="footer">
-        <p class="project-created-at">${projects[i].createdAt}</p>
-      </div>`;
+      <p class="project-name">${projects[i].name}</p>
+      <p class="project-owner">${projects[i].owner}</p>
+    </div>
+    <div class="separator"></div>
+    <div class="content">
+      <p class="project-description">${projects[i].description}</p>
+    </div>
+    <div class="footer">
+      <p class="project-created-at">${projects[i].timestamp}</p>
+    </div>`;
       projectList.appendChild(projectItem);
     }
   }
 
 
 });
+
 
 function triggerFileSelectionAndProcessing() {
   eel.select_and_process_image()(function (resultPath) {
@@ -268,23 +260,6 @@ function triggerFileSelectionAndProcessing() {
   });
 }
 
-
-function uploadImage() {
-  var input = document.getElementById('x');
-  if (input.files && input.files[0]) {
-    var reader = new FileReader();
-
-    reader.onload = function (e) {
-      // Send the image data to Python
-      eel.process_image(e.target.result)(function (res) {
-        console.log(res); // Log the response from Python
-      });
-    }
-
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
 // project
 
 function createFolder() {
@@ -293,44 +268,9 @@ function createFolder() {
 }
 
 
-async function addProject() {
-  var name = document.getElementById('projectNameAdd').value;
-  var author = document.getElementById('authorAdd').value;
-
-  console.log(name);
-  console.log(author);
-
-  if ((name == '' || author == '') || (name == null && author == null)) {
-    alert('Please fill in all fields');
-    return;
-  }
-
-  let isOkey = await eel.check_project_name(name);
-  if (isOkey == false) {
-    alert('Project name already exists');
-    return;
-  }
-  console.log(name, author);
-  let response = await eel.add_project(name, author)();
-  alert(response);
-
-  const projectlist = document.getElementById('project-list');
-  const projectItem = document.createElement('li');
-  projectItem.textContent = name;
-  projectlist.appendChild(projectItem);
-  showProjectList();
-}
-
-async function readProject() {
-  let response = await eel.read_project()();
-  const projectlist = document.getElementById('project-list');
-
-  response.forEach(project => {
-    const projectItem = document.createElement('li');
-    projectItem.textContent = project;
-    projectlist.appendChild(projectItem);
-  });
-
+async function fetchProjects() {
+  let response = await eel.get_projects()();
+  return response;
 }
 
 function showProjectList() {
@@ -388,3 +328,6 @@ function triggerImageSelection(labelId) {
     }
   });
 }
+
+
+

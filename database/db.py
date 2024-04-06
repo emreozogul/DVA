@@ -20,6 +20,7 @@ class DatabaseSingleton:
                     id INTEGER PRIMARY KEY,
                     name TEXT,
                     owner TEXT,
+                    desc TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             """,
