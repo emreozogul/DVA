@@ -62,6 +62,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
 
+
+
+
   const nextBtnImport = document.getElementById('submitBtnImport');
   nextBtnImport.addEventListener('click', function (event) {
     var allImagesUploaded = checkPhaseImagesAreUploaded();
@@ -239,6 +242,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="footer">
       <p class="project-created-at">${projects[i].timestamp}</p>
     </div>`;
+
       projectList.appendChild(projectItem);
     }
   }
