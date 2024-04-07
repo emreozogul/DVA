@@ -39,10 +39,6 @@ var projects = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
   projects = await loadProjects();
-  if (projects.length === 0) {
-    console.log('No projects found.');
-  }
-  console.log('Projects:', projects);
   updateProjectList();
 
   const openbtn = document.getElementById('openbtn');
@@ -88,6 +84,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const sProjectListBtn = document.getElementById('sProjectListBtn');
   sProjectListBtn.addEventListener('click', showProjectList);
+
+  // Get the modal
+  var modal = document.getElementById("myModal");
+
+  // Get the button that opens the modal
+  var btn = document.getElementById("HelpNav");
+
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+
+  // When the user clicks on the button, open the modal 
+  btn.onclick = function () {
+    modal.style.display = "block";
+  }
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function () {
+    modal.style.display = "none";
+  }
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+
 
 
   function updatePhaseUpload(phaseQuantity) {
@@ -190,7 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     var description = document.getElementById('descriptionAdd').value;
 
 
-    let response = await eel.check_project_exists(projectName)();
+    let response = await checkProjectExists(projectName);
     if (response) {
       alert('Project already exists.');
       return;
@@ -198,12 +221,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Create a new project
     var newProject = {
       owner: owner,
-      projectName: projectName,
+      name: projectName,
       description: description,
-      createdAt: new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     };
 
-    await eel.add_project(owner, projectName, description)();
+    await eel.add_project(projectName, owner, description)();
     projects.push(newProject);
 
     updateProjectList();
@@ -216,6 +239,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   function updateProjectList() {
     // Get the project list element<
     var projectList = document.getElementById('projects');
+    var projectSelect = document.getElementById('project-select');
+
+
 
     if (!projectList) {
       console.error('The "projects" element does not exist.');
@@ -223,6 +249,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     // Clear the project list
     projectList.innerHTML = '';
+    projectSelect.innerHTML = '<option value="">Select a project</option>';
 
 
     // Add each project to the project list
@@ -244,6 +271,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     </div>`;
 
       projectList.appendChild(projectItem);
+      projectSelect.innerHTML += `<option value="${projects[i].name}">${projects[i].name}</option>`;
     }
   }
 
@@ -333,5 +361,16 @@ function triggerImageSelection(labelId) {
   });
 }
 
+function checkProjectExists(projectName) {
+  projects.map(project => console.log(project.name));
+  let isExists = projects.find(project => project.name === projectName);
+  console.log("checkProjectExists -> isExists", isExists)
+  return isExists;
+}
+
+
+function openModal(message) {
+
+}
 
 

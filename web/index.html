@@ -84,7 +84,7 @@
 
         </div>
         <div style="display: flex; align-items:center ; justify-content: center;"> 
-            <div id="HelpNav" onclick="openModal('help');">
+            <div id="HelpNav">
                 <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -107,6 +107,12 @@
         <div id="importPageInput" class="section" >
             <div class="section-remaining">
                 <div class="form">
+                    <div style=" width: 100%;display: flex; align-items: center;justify-content: space-between;gap: 4px;margin-bottom: 20px;">
+                        <h2>Import</h2>
+                        <div class="button normal" id="submitBtnImport" >
+                            <span>Submit</span>
+                        </div>
+                    </div>
                     <div class="row">
                         <p> Author</p>
                         <input type="text"  id="projectName"/>
@@ -114,7 +120,7 @@
                     <div class="row">
                         <p>Project </p>
                         <div class="custom-select" style="display: flex; align-items:center;gap: 8px;" >
-                            <select class="project-select-import">
+                            <select class="project-select-import" id="project-select">
                                 <option value="">Select project</option>
                             </select>
                             <div class="button small" >
@@ -140,15 +146,12 @@
                             </label>
                         </div>
                     </div>
+                    
                 </div>
                 <div class="" id="phaseUpload" >
 
                 </div>
-                <div style=" width: 100%;display: flex; align-items: center;justify-content: center;gap: 4px;margin-bottom: 20px;">
-                    <div class="button normal" id="submitBtnImport" >
-                        <span>Submit</span>
-                    </div>
-                </div>
+                
             </div>
             
 
@@ -260,6 +263,18 @@
               <img id="image" src="" alt="Picture">
             </div>
         </div>
+    </div>
+
+    <div id="myModal" class="modal">
+        
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="row" style="display: flex; flex:1; justify-content:end; width:100%; align-items:center">
+                <span class="close">&times;</span>
+            </div>
+          <p>Some text in the Modal..</p>
+        </div>
+      
     </div>
     
 </body>
