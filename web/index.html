@@ -8,27 +8,46 @@
     <script src="./js/cropper.js" type="module"></script>
     <link rel="stylesheet" href="./css/cropper.css">
     <script type="text/javascript" src="/eel.js"></script>
+    <script src="./js/tiff.min.js"></script>
+    <script src="./js/canvastotiff.min.js"></script>
     <link rel="stylesheet" href="./css/style.css">
     <script src="./js/index.js" ></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var cropper;
-            document.getElementById('inputImage').addEventListener('change', function (event) {
-                var files = event.target.files;
+            document.getElementById('inputImage').addEventListener('change', function(event) {
+                const files = event.target.files;
                 if (files && files.length > 0) {
-                    var file = files[0];
-                    var imageURL = URL.createObjectURL(file);
-                    var image = document.getElementById('image')
-                    image.style.display = 'block';
-                    image.src = imageURL;
-                    if (cropper) {
-                        cropper.destroy();
+                    const file = files[0];
+            
+                    if (/\.tif$|\.tiff$/i.test(file.name)) {
+                        // Handle TIFF file
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const buffer = e.target.result;
+                            const tiff = new Tiff({buffer: buffer});
+                            const canvas = tiff.toCanvas();
+                            canvas.id = "image";
+                            const imgContainer = document.querySelector('.img-container');
+                            imgContainer.innerHTML = ""; // Clear the container
+                            imgContainer.appendChild(canvas);
+            
+                            // Initialize Cropper on the new canvas
+                            if (cropper) {
+                                cropper.destroy();
+                            }
+                            cropper = new Cropper(canvas, {
+                                aspectRatio: 1 / 1,
+                                background: false,
+                                highlight: false,
+                            });
+                        };
+                        reader.readAsArrayBuffer(file);
+                    } else {
+                        // Handle other file types as before
                     }
-                    cropper = new Cropper(document.getElementById('image'), {
-                        aspectRatio: 1 / 1,
-                    });
                 }
-              });
+            });
             
             document.getElementById('rotateLeft').addEventListener('click', function () {
             cropper.rotate(-45);
@@ -47,13 +66,29 @@
             });
             
             document.getElementById('crop').addEventListener('click', function() {
-                const canvas = cropper.getCroppedCanvas();
+                var canvas = cropper.getCroppedCanvas();
                 if (canvas) {
-                    document.getElementById('download').href = canvas.toDataURL();
-                    document.getElementById('download').download = 'croppedImage.png'; // Setting the filename
-                    document.getElementById('download').classList.remove('hidden');
+                    // Convert the canvas to a TIFF blob and then download it
+                    CanvasToTIFF.toBlob(canvas, function(blob) {
+                        // Create a URL for the blob
+                        var url = URL.createObjectURL(blob);
+                        
+                        // Create a temporary link to trigger the download
+                        var downloadLink = document.createElement('a');
+                        downloadLink.href = url;
+                        downloadLink.download = 'croppedImage.tiff'; // Specify the download filename
+                        
+                        // Append the link to the document, trigger the click, then remove it
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                        document.body.removeChild(downloadLink);
+            
+                        // Clean up the URL object
+                        URL.revokeObjectURL(url);
+                    });
                 }
             });
+            
             document.getElementById('download').addEventListener('click', function() {
                 this.classList.add('hidden');             
             });
@@ -254,7 +289,6 @@
             </a>
         </div>
         <div class="img-container">
-            <img id="image" src="" alt="Picture" style="display: none;">
         </div>
     
     </div>
