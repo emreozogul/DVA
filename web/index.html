@@ -9,56 +9,61 @@
     <link rel="stylesheet" href="./css/cropper.css">
     <script type="text/javascript" src="/eel.js"></script>
     <link rel="stylesheet" href="./css/style.css">
-    <script src="./js/index.js" ></script>    
-    <!-- Include other scripts and stylesheets as needed -->
-    <style>
-        .container {
-          margin: 20px auto;
-          max-width: 640px;
-        }
-        .img-container img {
-          max-width: 100%;
-          display: none; /* Initially hide the image */
-        }
-      </style>
+    <script src="./js/index.js" ></script>
     <script>
-        var cropper;
-        window.addEventListener('DOMContentLoaded', function () {
-            var image = document.getElementById('image');
-            var fileInput = document.getElementById('fileInput');
-    
+        document.addEventListener('DOMContentLoaded', function () {
             var cropper;
-    
-            /*fileInput.onchange = function (e) {
-            var files = e.target.files;
-            var reader = new FileReader();
-            reader.onload = function (e) {
-              image.src = e.target.result;
-              image.style.display = 'block'; // Show the image
-    
-              if (cropper) {
-                cropper.destroy(); // Destroy the old cropper instance
-              }
-              image.onload = function () {
-                cropper = new Cropper(image, {
-                    aspectRatio: 1 / 1,
-                    background: false,
-                    highlight: false,
-                    zoomable: false,
-                    zoomOnTouch: false,
-                    zoomOnWheel: false,
-                  }
-                 );
-                };
-            };
-            if (files && files.length > 0) {
-              reader.readAsDataURL(files[0]);
-              console.log(files[0]);
-            }
-          };
-          */
-        });
+            document.getElementById('inputImage').addEventListener('change', function (event) {
+                var files = event.target.files;
+                if (files && files.length > 0) {
+                    var file = files[0];
+                    var imageURL = URL.createObjectURL(file);
+                    var image = document.getElementById('image')
+                    image.style.display = 'block';
+                    image.src = imageURL;
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    cropper = new Cropper(document.getElementById('image'), {
+                        aspectRatio: 1 / 1,
+                    });
+                }
+              });
+            
+            document.getElementById('rotateLeft').addEventListener('click', function () {
+            cropper.rotate(-45);
+            });
+        
+            document.getElementById('rotateRight').addEventListener('click', function () {
+            cropper.rotate(45);
+            });
+        
+            document.getElementById('zoomIn').addEventListener('click', function () {
+            cropper.zoom(0.1);
+            });
+        
+            document.getElementById('zoomOut').addEventListener('click', function () {
+            cropper.zoom(-0.1);
+            });
+            
+            document.getElementById('crop').addEventListener('click', function() {
+                const canvas = cropper.getCroppedCanvas();
+                if (canvas) {
+                    document.getElementById('download').href = canvas.toDataURL();
+                    document.getElementById('download').download = 'croppedImage.png'; // Setting the filename
+                    document.getElementById('download').classList.remove('hidden');
+                }
+            });
+            document.getElementById('download').addEventListener('click', function() {
+                this.classList.add('hidden');             
+            });
 
+            document.getElementById('select').addEventListener('click', function () {
+            document.getElementById('inputImage').click();
+            });
+            
+        });
+        
         $(window).resize(function() {
             var minWidth = 800;
             var minHeight = 800;
@@ -71,7 +76,6 @@
             }
         });
     </script>
-
 </head>
 <body class="app">
     <div class="sidebar" id="sidebar">
@@ -106,7 +110,7 @@
     <div class="page" id="Import" style="display: none;">
         <div id="importPageInput" class="section" >
             <div class="section-remaining">
-                <div class="form">
+                <form class="form" id="importForm">
                     <div style=" width: 100%;display: flex; align-items: center;justify-content: space-between;gap: 4px;margin-bottom: 20px;">
                         <h2>Import</h2>
                         <div class="button normal" id="submitBtnImport" >
@@ -115,7 +119,7 @@
                     </div>
                     <div class="row">
                         <p> Author</p>
-                        <input type="text"  id="projectName"/>
+                        <input type="text"  id="authorImport"/>
                     </div>
                     <div class="row">
                         <p>Project </p>
@@ -146,11 +150,11 @@
                             </label>
                         </div>
                     </div>
-                    
-                </div>
-                <div class="" id="phaseUpload" >
+                    <div class="" id="phaseUpload" >
 
-                </div>
+                    </div>
+                </form>
+                
                 
             </div>
             
@@ -221,48 +225,38 @@
         </div>
     </div>
     <div class="page" id="Crop" style="display: none;">
-        <div class="buttonContainer" style="justify-content: center; align-items:center;">
-            <div style="display: flex ; flex-direction:row; gap: 4px;">
-                <div class="button small" id="rotateLeftButton" onclick="rotateLeft()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 24 24" fill="none">
-                        <path d="M11.5 20.5C6.80558 20.5 3 16.6944 3 12C3 7.30558 6.80558 3.5 11.5 3.5C16.1944 3.5 20 7.30558 20 12C20 13.5433 19.5887 14.9905 18.8698 16.238M22.5 15L18.8698 16.238M17.1747 12.3832L18.5289 16.3542L18.8698 16.238" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <div class="button small" id="cropButton" onclick="cropImage()">
-                    <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" transform="matrix(1, 0, 0, 1, 0, 0)">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier"> 
-                            <path d="M6 3V14.8C6 15.9201 6 16.4802 6.21799 16.908C6.40973 17.2843 6.71569 17.5903 7.09202 17.782C7.51984 18 8.0799 18 9.2 18H15M21 18H18M18 21V9.2C18 8.0799 18 7.51984 17.782 7.09202C17.5903 6.71569 17.2843 6.40973 16.908 6.21799C16.4802 6 15.9201 6 14.8 6H9M3 6H6M7 17L21 3" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
-                        </g>
-                    </svg>
-                </div>
-                <div class="button small" id="saveButton" onclick="saveImage()">
-                    <svg width="36px" height="36px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier"> 
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6ZM8.25 6.75V16.6838L12 14.4615L15.75 16.6838V6.75H8.25Z" fill="#ffffff"></path> 
-                        </g>
-                    </svg>    
-                </div>
-                <div class="button small" id ="resetButton" onclick="cancelCrop()">
-                    <svg fill="#ffffff" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g id="SVGRepo_iconCarrier">
-                            <path d="M7.004 23.087l7.08-7.081-7.07-7.071L8.929 7.02l7.067 7.069L23.084 7l1.912 1.913-7.089 7.093 7.075 7.077-1.912 1.913-7.074-7.073L8.917 25z"></path>
-                        </g>
-                    </svg>
-                </div>
-            </div>
+        
+        <div class="toolbox">
+            <input type="file" id="inputImage" accept="image/*" style="display: none;">
+            <button id="select" style="display: flex; gap: 4px; align-items:center;">
+                <span  style="font-size: 18px;" >Select</span>
+                <svg width="26px" height="26px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.7955 15.8111L21 21M18 10.5C18 14.6421 14.6421 18 10.5 18C6.35786 18 3 14.6421 3 10.5C3 6.35786 6.35786 3 10.5 3C14.6421 3 18 6.35786 18 10.5Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+            </button>
+            <button id="rotateLeft">
+                <svg width="26px" height="26px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="matrix(-1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M11.5 20.5C6.80558 20.5 3 16.6944 3 12C3 7.30558 6.80558 3.5 11.5 3.5C16.1944 3.5 20 7.30558 20 12C20 13.5433 19.5887 14.9905 18.8698 16.238M22.5 15L18.8698 16.238M17.1747 12.3832L18.5289 16.3542L18.8698 16.238" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+            </button>
+            <button id="rotateRight">
+                <svg width="26px" height="26px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M11.5 20.5C6.80558 20.5 3 16.6944 3 12C3 7.30558 6.80558 3.5 11.5 3.5C16.1944 3.5 20 7.30558 20 12C20 13.5433 19.5887 14.9905 18.8698 16.238M22.5 15L18.8698 16.238M17.1747 12.3832L18.5289 16.3542L18.8698 16.238" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+            </button>
+            <button id="zoomIn" >
+                <svg width="26px" height="26px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>zoom-in</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-308.000000, -1139.000000)" fill="#fff"> <path d="M321.46,1163.45 C315.17,1163.45 310.07,1158.44 310.07,1152.25 C310.07,1146.06 315.17,1141.04 321.46,1141.04 C327.75,1141.04 332.85,1146.06 332.85,1152.25 C332.85,1158.44 327.75,1163.45 321.46,1163.45 L321.46,1163.45 Z M339.688,1169.25 L331.429,1161.12 C333.592,1158.77 334.92,1155.67 334.92,1152.25 C334.92,1144.93 328.894,1139 321.46,1139 C314.026,1139 308,1144.93 308,1152.25 C308,1159.56 314.026,1165.49 321.46,1165.49 C324.672,1165.49 327.618,1164.38 329.932,1162.53 L338.225,1170.69 C338.629,1171.09 339.284,1171.09 339.688,1170.69 C340.093,1170.3 340.093,1169.65 339.688,1169.25 L339.688,1169.25 Z M326.519,1151.41 L322.522,1151.41 L322.522,1147.41 C322.522,1146.85 322.075,1146.41 321.523,1146.41 C320.972,1146.41 320.524,1146.85 320.524,1147.41 L320.524,1151.41 L316.529,1151.41 C315.978,1151.41 315.53,1151.59 315.53,1152.14 C315.53,1152.7 315.978,1153.41 316.529,1153.41 L320.524,1153.41 L320.524,1157.41 C320.524,1157.97 320.972,1158.41 321.523,1158.41 C322.075,1158.41 322.522,1157.97 322.522,1157.41 L322.522,1153.41 L326.519,1153.41 C327.07,1153.41 327.518,1152.96 327.518,1152.41 C327.518,1151.86 327.07,1151.41 326.519,1151.41 L326.519,1151.41 Z" id="zoom-in" sketch:type="MSShapeGroup"> </path> </g> </g> </g></svg>
+            </button>
+            <button id="zoomOut">
+                <svg width="26px" height="26px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>zoom-out</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-360.000000, -1139.000000)" fill="#ffffff"> <path d="M373.46,1163.45 C367.17,1163.45 362.071,1158.44 362.071,1152.25 C362.071,1146.06 367.17,1141.04 373.46,1141.04 C379.75,1141.04 384.85,1146.06 384.85,1152.25 C384.85,1158.44 379.75,1163.45 373.46,1163.45 L373.46,1163.45 Z M391.688,1169.25 L383.429,1161.12 C385.592,1158.77 386.92,1155.67 386.92,1152.25 C386.92,1144.93 380.894,1139 373.46,1139 C366.026,1139 360,1144.93 360,1152.25 C360,1159.56 366.026,1165.49 373.46,1165.49 C376.672,1165.49 379.618,1164.38 381.932,1162.53 L390.225,1170.69 C390.629,1171.09 391.284,1171.09 391.688,1170.69 C392.093,1170.3 392.093,1169.65 391.688,1169.25 L391.688,1169.25 Z M378.689,1151.41 L368.643,1151.41 C368.102,1151.41 367.663,1151.84 367.663,1152.37 C367.663,1152.9 368.102,1153.33 368.643,1153.33 L378.689,1153.33 C379.23,1153.33 379.669,1152.9 379.669,1152.37 C379.669,1151.84 379.23,1151.41 378.689,1151.41 L378.689,1151.41 Z" id="zoom-out" sketch:type="MSShapeGroup"> </path> </g> </g> </g></svg>
+            </button>
+            <button id="crop" style="display: flex; gap: 4px; align-items:center;">
+                <span  style="font-size: 18px;" >Crop</span>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 3V14.8C6 15.9201 6 16.4802 6.21799 16.908C6.40973 17.2843 6.71569 17.5903 7.09202 17.782C7.51984 18 8.0799 18 9.2 18H15M21 18H18M18 21V9.2C18 8.0799 18 7.51984 17.782 7.09202C17.5903 6.71569 17.2843 6.40973 16.908 6.21799C16.4802 6 15.9201 6 14.8 6H9M3 6H6" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+            </button>
+            <a id="download" class="hidden" style="display: flex; gap: 4px; align-items:center;">
+                <span  style="font-size: 18px;" >Download</span>
+                <svg width="26px" height="26px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12.5535 16.5061C12.4114 16.6615 12.2106 16.75 12 16.75C11.7894 16.75 11.5886 16.6615 11.4465 16.5061L7.44648 12.1311C7.16698 11.8254 7.18822 11.351 7.49392 11.0715C7.79963 10.792 8.27402 10.8132 8.55352 11.1189L11.25 14.0682V3C11.25 2.58579 11.5858 2.25 12 2.25C12.4142 2.25 12.75 2.58579 12.75 3V14.0682L15.4465 11.1189C15.726 10.8132 16.2004 10.792 16.5061 11.0715C16.8118 11.351 16.833 11.8254 16.5535 12.1311L12.5535 16.5061Z" fill="#ffffff"></path> <path d="M3.75 15C3.75 14.5858 3.41422 14.25 3 14.25C2.58579 14.25 2.25 14.5858 2.25 15V15.0549C2.24998 16.4225 2.24996 17.5248 2.36652 18.3918C2.48754 19.2919 2.74643 20.0497 3.34835 20.6516C3.95027 21.2536 4.70814 21.5125 5.60825 21.6335C6.47522 21.75 7.57754 21.75 8.94513 21.75H15.0549C16.4225 21.75 17.5248 21.75 18.3918 21.6335C19.2919 21.5125 20.0497 21.2536 20.6517 20.6516C21.2536 20.0497 21.5125 19.2919 21.6335 18.3918C21.75 17.5248 21.75 16.4225 21.75 15.0549V15C21.75 14.5858 21.4142 14.25 21 14.25C20.5858 14.25 20.25 14.5858 20.25 15C20.25 16.4354 20.2484 17.4365 20.1469 18.1919C20.0482 18.9257 19.8678 19.3142 19.591 19.591C19.3142 19.8678 18.9257 20.0482 18.1919 20.1469C17.4365 20.2484 16.4354 20.25 15 20.25H9C7.56459 20.25 6.56347 20.2484 5.80812 20.1469C5.07435 20.0482 4.68577 19.8678 4.40901 19.591C4.13225 19.3142 3.9518 18.9257 3.85315 18.1919C3.75159 17.4365 3.75 16.4354 3.75 15Z" fill="#ffffff"></path> </g></svg>
+            </a>
         </div>
-        <div class="container">
-            <button class="button normal" onclick="triggerFileSelectionAndProcessing()">Select and Process Image</button>
-            <div class="img-container">
-              <img id="image" src="" alt="Picture">
-            </div>
+        <div class="img-container">
+            <img id="image" src="" alt="Picture" style="display: none;">
         </div>
+    
     </div>
 
     <div id="myModal" class="modal">

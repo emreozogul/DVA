@@ -16,6 +16,11 @@ a {
     box-sizing: border-box;
 }
 
+input {
+    all: unset;
+    box-sizing: border-box;
+}
+
 img {
     display: block;
     max-width: 100%;
@@ -225,7 +230,7 @@ img {
 .normal {
     font-size: 20px;
     height: 40px;
-    padding: 4px 16px;
+    padding: 4px 8px;
 
 }
 
@@ -257,6 +262,7 @@ img {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
     background-color: #574f4f0f;
+    border: 1px solid #ccc;
     padding: 20px;
     border-radius: 4px;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
@@ -326,6 +332,7 @@ img {
     gap: 20px;
     background-color: #574f4f0f;
     border: 1px solid #ccc;
+
     padding: 20px;
     border-radius: 4px;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
@@ -518,4 +525,42 @@ img {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+
+/* crop page */
+
+.toolbox {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 20px;
+
+}
+
+.toolbox button,
+.toolbox a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #111;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.toolbox button:hover,
+.toolbox a:hover {
+    background-color: #444;
+}
+
+.img-container {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.hidden {
+    display: none;
 }

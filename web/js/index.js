@@ -57,33 +57,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-
-
-
-
-  const nextBtnImport = document.getElementById('submitBtnImport');
-  nextBtnImport.addEventListener('click', function (event) {
+  document.getElementById("importForm").addEventListener('submit', async function (event) {
+    event.preventDefault();
     var allImagesUploaded = checkPhaseImagesAreUploaded();
-
-    if (!allImagesUploaded) {
-      console.log('Not all images have been uploaded');
-      event.preventDefault();
-
+    var select = document.getElementById("project-select");
+    var value = select.options[select.selectedIndex].value;
+    var author = document.getElementById('author').value;
+    var phaseQuantity = document.querySelector('.choicebox-container input[type="radio"][name="radio"]:checked').value;
+    console.log("importForm -> select value", value)
+    if (value === '' || value === undefined || value === null || value === "Select a project") {
+      alert('Select a project first.');
+      return;
+    }
+    else if (phaseQuantity === '' || phaseQuantity === undefined || phaseQuantity === null) {
+      alert('Select the number of phases first.');
+      return;
+    }
+    else if (!allImagesUploaded) {
+      alert('Not all images have been uploaded');
     } else {
-      // nextPageImport();
-      // submitPageImport();
+      submitPageImport();
     }
 
   });
 
-  const prevBtnImport = document.getElementById('prevBtnImport');
-  prevBtnImport.addEventListener('click', prevPageImport);
+  document.getElementById('prevBtnImport').addEventListener('click', prevPageImport);
 
-  const sNewProjectBtn = document.getElementById('sNewProjectBtn');
-  sNewProjectBtn.addEventListener('click', showAddScreenProject);
+  document.getElementById('sNewProjectBtn').addEventListener('click', showAddScreenProject);
 
-  const sProjectListBtn = document.getElementById('sProjectListBtn');
-  sProjectListBtn.addEventListener('click', showProjectList);
+  document.getElementById('sProjectListBtn').addEventListener('click', showProjectList);
 
   // Get the modal
   var modal = document.getElementById("myModal");
@@ -110,6 +112,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       modal.style.display = "none";
     }
   }
+
+
+
+  function openModal(message) {
+
+  }
+
 
 
 
@@ -369,8 +378,5 @@ function checkProjectExists(projectName) {
 }
 
 
-function openModal(message) {
-
-}
 
 
