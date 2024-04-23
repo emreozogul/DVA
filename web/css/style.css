@@ -311,7 +311,7 @@ img {
 
 .project-list li .footer {
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
     align-items: center;
     flex: 1;
     width: 100%;
@@ -321,6 +321,24 @@ img {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.project-list li .footer .project-actions {
+    display: flex;
+    gap: 10px;
+
+}
+
+.project-list li .footer .project-actions .project-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #111;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px;
 }
 
 

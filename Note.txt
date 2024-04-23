@@ -16,3 +16,14 @@ TO_DO:
         + image processing pipeline'dan çıkan csv dosyası decision tree modelinde çalışmaya uyumlu olması lazım
         + aynı zamanda model script'i içerisinde X ve y için csv'den doğru değerler seçilmesi lazım. (fotoğraf adı, target etc.) 
 - image processing sonrası çıkan csv kontrol edilmeli aynı fotoğraf için birden fazla row çıkartıyor en büyük olanı tek olarak çıkartması lazım.
+Front: 
+-import sayfasında submit edildiği zaman image processing pipeline ardından ml çalıştırılmasının bağlanması lazım
+- project sayfasında proje olmadığı zaman label olması lazım
+- landing page 
+- crop sayfasında cropper sizeı fixed olmalı 
+Backend: 
+- şuan için databasede 2 table var, projects ve cells. Ayrı bir table daha gerekiyor CellPhases olarak.
+        + Tableların güncellenmesi lazım
+        + Yeni queryler gerekli
+-pipeline ve ml modelinin çalıştırma fonksiyonları fronta bağlanabilir bir fonksiyona döndürülmesi lazım
+

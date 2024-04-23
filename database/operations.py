@@ -26,28 +26,36 @@ class DatabaseOperations:
         cursor.execute("UPDATE projects SET name = ?, owner = ? , desc = ? WHERE id = ?", (name, owner, project_id))
         conn.commit()
 
-    def delete_project(self, project_id):
+    def delete_project(self, project_name):
         conn = self.db.get_connection()
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM projects WHERE id = ?", (project_id,))
+        cursor.execute("DELETE FROM projects WHERE name = ?", (project_name,))
         conn.commit()
 
-    def create_cell(self, project_id, image_name, area_mm2, perimeter_mm, diameter_mm, class_):
-        conn = self.db.get_connection()
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO cells (project_id, image_name, area_mm2, perimeter_mm, diameter_mm, class) VALUES (?, ?, ?, ?, ?, ?)", (project_id, image_name, area_mm2, perimeter_mm, diameter_mm, class_))
+    def create_cell(conn, cell_data):
+        sql = ''' INSERT INTO cells(cell_id, project_id, phase, image_name, area_mm2, perimeter_mm, diameter_mm, class)
+                VALUES(?,?,?,?,?,?,?,?) '''
+        cur = conn.cursor()
+        cur.execute(sql, cell_data)
         conn.commit()
 
-    def read_cells(self):
-        conn = self.db.get_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM cells")
-        return cursor.fetchall()
-
-    def update_cell(self, cell_id, project_id, image_name, area_mm2, perimeter_mm, diameter_mm, class_):
-        conn = self.db.get_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE cells SET project_id = ?, image_name = ?, area_mm2 = ?, perimeter_mm = ?, diameter_mm = ?, class = ? WHERE id = ?", (project_id, image_name, area_mm2, perimeter_mm, diameter_mm, class_, cell_id))
+    def read_cells(conn, cell_id=None):
+        cur = conn.cursor()
+        query = "SELECT * FROM cells"
+        if cell_id:
+            query += " WHERE cell_id=?"
+            cur.execute(query, (cell_id,))
+        else:
+            cur.execute(query)
+        rows = cur.fetchall()
+        return rows
+    
+    def update_cell(conn, cell_data):
+        sql = ''' UPDATE cells
+                SET class = ?, image_name = ?
+                WHERE cell_id = ? AND phase = ?'''
+        cur = conn.cursor()
+        cur.execute(sql, cell_data)
         conn.commit()
 
     def delete_cell(self, cell_id):

@@ -10,16 +10,10 @@ import cv2
 import wx
 from prework.imageProcessing import process_image
 
-
-
-# Initialize database connection
 db = DatabaseSingleton()
 conn = db.get_connection()
 c = conn.cursor()
-
-# Initialize database operations
 ops = DatabaseOperations(db)
-
 
 @eel.expose
 def add_project(name, owner, desc):
@@ -33,17 +27,20 @@ def get_projects():
     simplified_projects = [{"id": project[0], "name": project[1], "owner": project[2], "description": project[3], "timestamp": project[4]} for project in projects]
     return simplified_projects
 
-def create_folder(folder_path):
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
-        print(f"Folder '{folder_path}' created.")
-    else:
-        print(f"Folder '{folder_path}' already exists.")
-
-@eel.expose  # Expose this function to the JavaScript
+@eel.expose  
 def create_new_folder(folder_name):
-    create_folder(folder_name)
+    # Create a new folder in the current directory with the given name inside the "projects" folder
+    folder_path = os.path.join(os.getcwd(), "projects", folder_name)
+    os.makedirs(folder_path, exist_ok=True)
+    return folder_path
 
+@eel.expose
+def delete_project(projetName):
+    ops.delete_project(projetName)
+    folder_path = os.path.join(os.getcwd(), "projects", projetName)
+    os.rmdir(folder_path)
+    conn.commit()
+    return "Project deleted successfully."
 
 @eel.expose
 def select_and_process_image():
@@ -52,7 +49,6 @@ def select_and_process_image():
     dialog = wx.FileDialog(None, 'Open', wildcard="*.png;*.jpg;*.jpeg;*.tif", style=style)
     if dialog.ShowModal() == wx.ID_OK:
         image_path = dialog.GetPath()
-        # Process the image using the file path
         result_path = process_image(image_path)
     else:
         result_path = None
@@ -80,8 +76,43 @@ def check_project_exists(project_name):
         return True
     else:
         return False
+    
+@eel.expose
+def new_cell(projectName, image_paths):
+    x = 0
+    #fetch the last cell id and increment it by 1
+    c.execute('SELECT MAX(cell_id) FROM cells')
+    last_cell_id = c.fetchone()[0]
+    if last_cell_id is None:
+        last_cell_id = 0
+    else:
+        last_cell_id += 1
+        
+    c.execute('SELECT id FROM projects WHERE name = ?', (projectName,))
+    project_id = c.fetchone()[0]
+    
+    results = []
+    for image_path in image_paths:
+        result = process_image(image_path) #process the image and get the results
+        # new features can be added here
+        perimeter = 5 #result["perimeter"] 
+        area = 10  # result["area"]
+        diameter = 2 # result["diameter"]
+        classification = 0 # result["classification"]
+        values = (last_cell_id, project_id, x, image_path, area, perimeter, diameter, classification)
+        x += 1 
+        results.append(result)
+        add_cell(values)
+        
+    return results
+          
+def add_cell(values):
+    conn = db.get_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO cells (cell_id, project_id, phase, image_name, area_mm2, perimeter_mm, diameter_mm, class) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", values)
+    conn.commit()
 
-# This function will be assigned to an input in js  
+
 @eel.expose
 def run_processing_and_model():
     python_path = sys.executable
@@ -99,6 +130,5 @@ if __name__ == '__main__':
     eel.init('web')  # Give folder containing web files
     #set constaints for the window size min 500x500 and max 1000x800
     eel.init('web', allowed_extensions=['.js', '.html', '.css'])
-    eel.start('index.html', size=(1000, 800), position=(100, 100))    # Start
-    conn.close()
+    eel.start('index.html', size=(1000, 800), position=(100, 100))    
     

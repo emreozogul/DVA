@@ -41,11 +41,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   projects = await loadProjects();
   updateProjectList();
 
-  const openbtn = document.getElementById('openbtn');
-  openbtn.addEventListener('click', openNav);
+  document.getElementById('openbtn').addEventListener('click', openNav);
 
-  const closebtn = document.getElementById('closebtn');
-  closebtn.addEventListener('click', closeNav);
+  document.getElementById('closebtn').addEventListener('click', closeNav);
+
+  document.getElementById('prevBtnImport').addEventListener('click', prevPageImport);
+
+  document.getElementById('sNewProjectBtn').addEventListener('click', showAddScreenProject);
+
+  document.getElementById('sProjectListBtn').addEventListener('click', showProjectList);
 
   document.querySelector('.navContainer').addEventListener('click', function (event) {
     // Check if the clicked element is one of the divs you're interested in
@@ -62,9 +66,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     var allImagesUploaded = checkPhaseImagesAreUploaded();
     var select = document.getElementById("project-select");
     var value = select.options[select.selectedIndex].value;
-    var author = document.getElementById('author').value;
     var phaseQuantity = document.querySelector('.choicebox-container input[type="radio"][name="radio"]:checked').value;
     console.log("importForm -> select value", value)
+    console.log("importForm -> phaseQuantity", phaseQuantity)
+    console.log("importForm -> allImagesUploaded", allImagesUploaded)
+    console.log("select", select)
+
     if (value === '' || value === undefined || value === null || value === "Select a project") {
       alert('Select a project first.');
       return;
@@ -72,20 +79,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     else if (phaseQuantity === '' || phaseQuantity === undefined || phaseQuantity === null) {
       alert('Select the number of phases first.');
       return;
-    }
-    else if (!allImagesUploaded) {
-      alert('Not all images have been uploaded');
     } else {
-      submitPageImport();
+      var phaseContainer = document.getElementById('phaseUpload');
+      var imagePaths = [];
+      if (phaseContainer.hasChildNodes()) {
+        var labels = phaseContainer.getElementsByClassName('label');
+
+        for (var i = 0; i < labels.length; i++) {
+          imagePaths.push(labels[i].textContent);
+        }
+      }
+      console.log("importForm -> imagePaths", imagePaths)
+      var projectName = select.options[select.selectedIndex].value;
+      var project = projects.find(project => project.name === projectName);
+      console.log("importForm -> projectPath", projectPath)
+      // eel.import_images(projectPath, imagePaths, phaseQuantity)();
+
     }
 
   });
-
-  document.getElementById('prevBtnImport').addEventListener('click', prevPageImport);
-
-  document.getElementById('sNewProjectBtn').addEventListener('click', showAddScreenProject);
-
-  document.getElementById('sProjectListBtn').addEventListener('click', showProjectList);
 
   // Get the modal
   var modal = document.getElementById("myModal");
@@ -113,13 +125,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-
-
   function openModal(message) {
 
   }
-
-
 
 
   function updatePhaseUpload(phaseQuantity) {
@@ -142,7 +150,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <path d="M16.19 2H7.81C4.17 2 2 4.17 2 7.81V16.18C2 19.83 4.17 22 7.81 22H16.18C19.82 22 21.99 19.83 21.99 16.19V7.81C22 4.17 19.83 2 16.19 2ZM17.53 7.53L9.81 15.25H12.83C13.24 15.25 13.58 15.59 13.58 16C13.58 16.41 13.24 16.75 12.83 16.75H8C7.59 16.75 7.25 16.41 7.25 16V11.17C7.25 10.76 7.59 10.42 8 10.42C8.41 10.42 8.75 10.76 8.75 11.17V14.19L16.47 6.47C16.62 6.32 16.81 6.25 17 6.25C17.19 6.25 17.38 6.32 17.53 6.47C17.82 6.76 17.82 7.24 17.53 7.53Z" fill="#000000"></path> 
               </g>
             </svg>
-            
           </div>
         </div>
         <div class="row" >
@@ -213,10 +220,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   document.getElementById('addProjectForm').addEventListener('submit', async function (event) {
-    // Prevent the form from submitting normally
     event.preventDefault();
 
-    // Get the values of the input fields
     var owner = document.getElementById('authorAdd').value;
     var projectName = document.getElementById('projectNameAdd').value;
     var description = document.getElementById('descriptionAdd').value;
@@ -227,7 +232,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       alert('Project already exists.');
       return;
     }
-    // Create a new project
     var newProject = {
       owner: owner,
       name: projectName,
@@ -236,6 +240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     await eel.add_project(projectName, owner, description)();
+    await eel.create_new_folder(projectName)();
     projects.push(newProject);
 
     updateProjectList();
@@ -246,7 +251,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   function updateProjectList() {
-    // Get the project list element<
     var projectList = document.getElementById('projects');
     var projectSelect = document.getElementById('project-select');
 
@@ -254,9 +258,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!projectList) {
       console.error('The "projects" element does not exist.');
-      return;  // Exit the function if the element doesn't exist
+      return;
     }
-    // Clear the project list
     projectList.innerHTML = '';
     projectSelect.innerHTML = '<option value="">Select a project</option>';
 
@@ -276,6 +279,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p class="project-description">${projects[i].description}</p>
     </div>
     <div class="footer">
+      <div class="project-actions">
+        <button class="project-action" onclick="overviewProject('${projects[i].name}')">Overview</button>
+        <button class="project-action" style="background-color:#d83131; color:black;" onclick="deleteProject('${projects[i].name}')">Delete</button>
+      </div>
       <p class="project-created-at">${projects[i].timestamp}</p>
     </div>`;
 
@@ -287,21 +294,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 });
 
+// project
 
-function triggerFileSelectionAndProcessing() {
-  eel.select_and_process_image()(function (resultPath) {
-    if (resultPath) {
-      console.log('Image processed and saved to:', resultPath);
-      // You can now display the processed image or inform the user
-      // For example, update the 'src' of an img tag to show the processed image
-      document.getElementById('processedImage').src = resultPath;
-    } else {
-      console.log('No image was selected.');
-    }
-  });
+
+async function deleteProject(projectName) {
+  await eel.delete_project(projectName)();
+  projects = projects.filter(project => project.name !== projectName);
+  updateProjectList();
 }
 
-// project
+function updateProjectList() {
+  var projectList = document.getElementById('projects');
+  var projectSelect = document.getElementById('project-select');
+
+  if (!projectList) {
+    console.error('The "projects" element does not exist.');
+    return;
+  }
+  projectList.innerHTML = '';
+  projectSelect.innerHTML = '<option value="">Select a project</option>';
+
+  // Add each project to the project list
+  for (var i = 0; i < projects.length; i++) {
+    // Create a new list item element for the project with project name title and owner as text and createdAt as text
+    var projectItem = document.createElement('li');
+    projectItem.innerHTML =
+      `<div class="header">
+      <p class="project-name">${projects[i].name}</p>
+      <p class="project-owner">${projects[i].owner}</p>
+    </div>
+    <div class="separator"></div>
+    <div class="content">
+      <p class="project-description">${projects[i].description}</p>
+    </div>
+    <div class="footer">
+      <div class="project-actions">
+        <button class="project-action" onclick="overviewProject('${projects[i].name}')">Overview</button>
+        <button class="project-action" style="background-color:#d83131; color:black;" onclick="deleteProject('${projects[i].name}')">Delete</button>
+      </div>
+      <p class="project-created-at">${projects[i].timestamp}</p>
+    </div>`;
+    projectList.appendChild(projectItem);
+    projectSelect.innerHTML += `<option value="${projects[i].name}">${projects[i].name}</option>`;
+  }
+}
 
 function createFolder() {
   var folderName = document.getElementById('projectName').value;

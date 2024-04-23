@@ -68,22 +68,14 @@
             document.getElementById('crop').addEventListener('click', function() {
                 var canvas = cropper.getCroppedCanvas();
                 if (canvas) {
-                    // Convert the canvas to a TIFF blob and then download it
                     CanvasToTIFF.toBlob(canvas, function(blob) {
-                        // Create a URL for the blob
                         var url = URL.createObjectURL(blob);
-                        
-                        // Create a temporary link to trigger the download
                         var downloadLink = document.createElement('a');
                         downloadLink.href = url;
-                        downloadLink.download = 'croppedImage.tiff'; // Specify the download filename
-                        
-                        // Append the link to the document, trigger the click, then remove it
+                        downloadLink.download = 'croppedImage.tiff';
                         document.body.appendChild(downloadLink);
                         downloadLink.click();
                         document.body.removeChild(downloadLink);
-            
-                        // Clean up the URL object
                         URL.revokeObjectURL(url);
                     });
                 }
@@ -148,13 +140,9 @@
                 <form class="form" id="importForm">
                     <div style=" width: 100%;display: flex; align-items: center;justify-content: space-between;gap: 4px;margin-bottom: 20px;">
                         <h2>Import</h2>
-                        <div class="button normal" id="submitBtnImport" >
+                        <button type="submit" class="button normal" id="submitBtnImport" >
                             <span>Submit</span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <p> Author</p>
-                        <input type="text"  id="authorImport"/>
+                        </button>
                     </div>
                     <div class="row">
                         <p>Project </p>
@@ -189,12 +177,7 @@
 
                     </div>
                 </form>
-                
-                
             </div>
-            
-
-
         </div>
         
         <div id="importPageResult" class="section" style="display: none;">
@@ -222,9 +205,7 @@
                 </div>
             </div>
             <div>
-                <ul class="project-list" id="projects">
-
-                </ul>
+                <ul class="project-list" id="projects"></ul>
             </div>
             
         </div>
@@ -300,7 +281,9 @@
             <div class="row" style="display: flex; flex:1; justify-content:end; width:100%; align-items:center">
                 <span class="close">&times;</span>
             </div>
-          <p>Some text in the Modal..</p>
+          <div class="modal-content-body" id="modalBody">
+
+          </div>
         </div>
       
     </div>
