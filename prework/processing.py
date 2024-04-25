@@ -8,20 +8,21 @@ import os
 import subprocess
 import sys
 
+# Calculate the features of a contour
 def calculate_features(contour, scale_factor):
     area_pixels = cv2.contourArea(contour)
     perimeter_pixels = cv2.arcLength(contour, True)
     (_, _), radius_pixels = cv2.minEnclosingCircle(contour)
+    # Calculate the roundness of the contour    
     roundness = 4 * np.pi * area_pixels / (perimeter_pixels ** 2)
-    # Convert to millimeters
     area_mm2 = area_pixels * scale_factor ** 2
     perimeter_mm = perimeter_pixels * scale_factor
     diameter_mm = 2 * radius_pixels * scale_factor
-    # Additional Features
+    # Calculate the aspect ratio of the minimum bounding rectangle of the contour   
     rect = cv2.minAreaRect(contour)
     width, height = rect[1][0], rect[1][1]
     aspect_ratio = max(width, height) / min(width, height) if min(width, height) > 0 else 0
-
+    # Calculate the solidity and convexity of the contour
     hull = cv2.convexHull(contour)
     hull_area = cv2.contourArea(hull)
     solidity = area_pixels / hull_area if hull_area > 0 else 0
@@ -30,7 +31,7 @@ def calculate_features(contour, scale_factor):
 
     return area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity
 
-# Process an image to extract the largest contour and its features.
+# Process an image and return the features and contoured image
 def process_image(image_path, scale_factor):
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -51,83 +52,70 @@ def process_image(image_path, scale_factor):
     else:
         return None, None
     
-def process_images_4x(image_dir, scale_factor_4x):
+# Process 4x images and return the features and contoured images
+def process_images_4x(image_dir, scale_factor):
     image_paths = [os.path.join(image_dir, img) for img in os.listdir(image_dir) if img.endswith(('.tif', '.jpg', '.png'))]
-    images = [cv2.imread(path, cv2.IMREAD_GRAYSCALE) for path in image_paths]
-    low_threshold = 30
-    high_threshold = 120
     features_4x = []
-    contoured_images_4x = []  # To store contoured images
+    contoured_images_4x = []
 
-    for image in images:
-        edge = cv2.Canny(image, low_threshold, high_threshold)
-        kernel = np.ones((13, 13), np.uint8)
-        closing = cv2.morphologyEx(edge, cv2.MORPH_CLOSE, kernel, iterations=3)
+    for path in image_paths:
+        image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+        edges = cv2.Canny(image, 30, 120)
+        kernel = np.ones((5, 5), np.uint8)
+        closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=3)
         contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        
         if contours:
             largest_contour = max(contours, key=cv2.contourArea)
             contoured_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
             cv2.drawContours(contoured_image, [largest_contour], -1, (0, 255, 0), 3)
-            area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity = calculate_features(largest_contour, scale_factor_4x)
-            image_bgr = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-            particle_count = count_particles_4x(image_bgr)
-            features_4x.append((area_mm2, perimeter_mm, diameter_mm, roundness,  aspect_ratio, solidity, convexity,particle_count))
+            features = calculate_features(largest_contour, scale_factor)
+            particle_count = count_particles_4x(cv2.cvtColor(image, cv2.COLOR_GRAY2BGR))
+            features_4x.append(features + (particle_count,))
             contoured_images_4x.append(contoured_image)
     return features_4x, contoured_images_4x, [os.path.basename(path) for path in image_paths]
 
-def calculate_average_color(image, contour):
-    mask = np.zeros(image.shape[:2], dtype="uint8")
-    cv2.drawContours(mask, [contour], -1, 255, -1)
-    mask = cv2.bitwise_and(image, image, mask=mask)
-    return cv2.mean(mask)[:3]
-
-def count_particles(image, spheroid_contour=None, spheroid_color=None):
-    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    
-    if spheroid_color is not None:
-        lower_bound = np.array([spheroid_color[0] - 10, 100, 100], dtype=np.uint8)
-        upper_bound = np.array([spheroid_color[0] + 10, 255, 255], dtype=np.uint8)
-        color_mask = cv2.inRange(hsv_image, lower_bound, upper_bound)
-        thresh_image = cv2.bitwise_and(hsv_image, hsv_image, mask=color_mask)
-        thresh_image = cv2.cvtColor(thresh_image, cv2.COLOR_BGR2GRAY)
-    else:
-        thresh_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
-    thresh_image = cv2.adaptiveThreshold(thresh_image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+# Count the number of particles in an image
+def count_particles(image, min_area=100, max_area=5000, circularity_thresh=0.5):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
     kernel = np.ones((3, 3), np.uint8)
-    opened_image = cv2.morphologyEx(thresh_image, cv2.MORPH_OPEN, kernel, iterations=2)
-    contours, _ = cv2.findContours(opened_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    
-    # Exclude contours within the spheroid area if spheroid_contour is provided
-    if spheroid_contour is not None:
-        moment = cv2.moments(spheroid_contour)
-        sx = int(moment["m10"] / moment["m00"])
-        sy = int(moment["m01"] / moment["m00"])
-        contours = [contour for contour in contours if cv2.pointPolygonTest(spheroid_contour, (sx, sy), False) < 0]
-    
-    return len(contours)
+    opened = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
+    contours, _ = cv2.findContours(opened, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-def count_particles_4x(image):
-    # Gri tonlamaya dönüştür
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # Gürültü azaltma için hafif bir bulanıklık uygula
-    blurred = cv2.GaussianBlur(gray_image, (5, 5), 0)
-    # Uygun eşik değerini bul ve ikili görüntü oluştur
-    _, thresh = cv2.threshold(blurred, 127, 255, cv2.THRESH_BINARY_INV)
-    
-    # Morfolojik işlemler için kernel tanımla
+    particle_count = 0
+
+    for contour in contours:
+        area = cv2.contourArea(contour)
+        if min_area <= area <= max_area:
+            perimeter = cv2.arcLength(contour, True)
+            circularity = 4 * np.pi * (area / (perimeter ** 2)) if perimeter > 0 else 0
+
+            if circularity >= circularity_thresh:
+                particle_count += 1
+
+    return particle_count
+
+def count_particles_4x(image, min_area=50, max_area=2500, circularity_thresh=0.2):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
     kernel = np.ones((3, 3), np.uint8)
-    # Görüntüdeki küçük delikleri doldurmak ve parçacıkları daha iyi tanımlamak için kapatma işlemi uygula
-    closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=2)
-    
-    # Konturları bul
-    contours, _ = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    # Kontur sayısını döndür
-    return len(contours)
+    opened = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
+    contours, _ = cv2.findContours(opened, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+    particle_count = 0
+
+    for contour in contours:
+        area = cv2.contourArea(contour)
+        if min_area <= area <= max_area:
+            perimeter = cv2.arcLength(contour, True)
+            circularity = 4 * np.pi * (area / (perimeter ** 2)) if perimeter > 0 else 0
+
+            if circularity >= circularity_thresh:
+                particle_count += 1
+
+    return particle_count
 
 def write_features_to_csv_mm(features, image_names, output_dir, target_values):
     timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
@@ -183,9 +171,8 @@ def write_features_to_csv_4x(features, image_names, output_dir, target_values_4x
             })
     return csv_file_path
 
-# Set parameters for image processing.
+# Set parameters for image processing.    
 scale_factor = 0.0786
-scale_factor_4x = ((0.0786)*10)/4
 spheroid_image_dir = 'prework/assets/images'
 spheroid_image_dir_4x = 'prework/assets/images4x'
 output_dir = 'prework/data'
@@ -197,7 +184,7 @@ target_values_4x = ["1", "0", "1", "0", "1", "0", "1", "0", "1", "0"]
 target_values = ["1"]
 
 # Process 4x images and write the features to a CSV file.
-features_4x, contoured_images_4x, image_names_4x = process_images_4x(spheroid_image_dir_4x, scale_factor_4x)
+features_4x, contoured_images_4x, image_names_4x = process_images_4x(spheroid_image_dir_4x, scale_factor)
 csv_file_path_4x = write_features_to_csv_4x(features_4x, image_names_4x, output_dir, target_values_4x)
 print(f"4x features CSV file saved to: {csv_file_path_4x}")
 
