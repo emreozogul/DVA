@@ -39,11 +39,9 @@ def process_image_10x(image_path, scale_factor=0.0756):
     contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
-        contoured_image = cv2.drawContours(image.copy(), [largest_contour], -1, (0, 255, 0), 2)
         area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity = calculate_features(largest_contour, scale_factor)
         particle_count = count_particles(image)
-
-        return (area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity, particle_count), contoured_image
+        return area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity, particle_count
     else:
         return None, None
     
@@ -56,11 +54,10 @@ def process_image_4x(image_path, scale_factor=0.189):
     contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
-        contoured_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-        cv2.drawContours(contoured_image, [largest_contour], -1, (0, 255, 0), 3)
-        features = calculate_features(largest_contour, scale_factor)
+        area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity  = calculate_features(largest_contour, scale_factor)
         particle_count = count_particles_4x(cv2.cvtColor(image, cv2.COLOR_GRAY2BGR))
-        return features + (particle_count,), contoured_image
+        return area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity, particle_count
+
     else:
         return None, None
 

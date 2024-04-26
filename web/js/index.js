@@ -52,9 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('sProjectListBtn').addEventListener('click', showProjectList);
 
   document.querySelector('.navContainer').addEventListener('click', function (event) {
-    // Check if the clicked element is one of the divs you're interested in
     if (event.target.classList.contains('navItem')) {
-      // Get the 'data-section' attribute of the clicked div
       var sectionId = event.target.getAttribute('data-section');
       console.log(sectionId);
       showSection(sectionId);
@@ -63,23 +61,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById("importForm").addEventListener('submit', async function (event) {
     event.preventDefault();
-    var allImagesUploaded = checkPhaseImagesAreUploaded();
     var select = document.getElementById("project-select");
-    var value = select.options[select.selectedIndex].value;
+    var projectName = select.options[select.selectedIndex].value;
     var phaseQuantity = document.querySelector('.choicebox-container input[type="radio"][name="radio"]:checked').value;
-    console.log("importForm -> select value", value)
-    console.log("importForm -> phaseQuantity", phaseQuantity)
-    console.log("importForm -> allImagesUploaded", allImagesUploaded)
-    console.log("select", select)
-
-    if (value === '' || value === undefined || value === null || value === "Select a project") {
+    var scaleSelects = document.querySelectorAll('.import-custom-select');
+    var cellName = document.getElementById('cellName').value;
+    var scaleValues = [];
+    scaleSelects.forEach(function (select) {
+      scaleValues.push(select.querySelector('.scale-select').value);
+    });
+    console.log('scaleValues:', scaleValues);
+    if (projectName === '' || projectName === undefined || projectName === null || projectName === "Select a project") {
       alert('Select a project first.');
       return;
     }
     else if (phaseQuantity === '' || phaseQuantity === undefined || phaseQuantity === null) {
       alert('Select the number of phases first.');
       return;
-    } else {
+    } else if (!checkPhaseImagesAreUploaded()) {
+      alert('Please upload an image for each phase.');
+      return;
+    }
+    else {
       var phaseContainer = document.getElementById('phaseUpload');
       var imagePaths = [];
       if (phaseContainer.hasChildNodes()) {
@@ -89,36 +92,21 @@ document.addEventListener('DOMContentLoaded', async () => {
           imagePaths.push(labels[i].textContent);
         }
       }
-      console.log("importForm -> imagePaths", imagePaths)
-      var projectName = select.options[select.selectedIndex].value;
-      var project = projects.find(project => project.name === projectName);
-      console.log("importForm -> projectPath", projectPath)
-      // eel.import_images(projectPath, imagePaths, phaseQuantity)();
+      eel.import_images(projectName, cellName, imagePaths, scaleValues)();
 
     }
 
   });
 
-  // Get the modal
   var modal = document.getElementById("myModal");
-
-  // Get the button that opens the modal
   var btn = document.getElementById("HelpNav");
-
-  // Get the <span> element that closes the modal
   var span = document.getElementsByClassName("close")[0];
-
-  // When the user clicks on the button, open the modal 
   btn.onclick = function () {
     modal.style.display = "block";
   }
-
-  // When the user clicks on <span> (x), close the modal
   span.onclick = function () {
     modal.style.display = "none";
   }
-
-  // When the user clicks anywhere outside of the modal, close it
   window.onclick = function (event) {
     if (event.target == modal) {
       modal.style.display = "none";
@@ -129,14 +117,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   }
 
-
   function updatePhaseUpload(phaseQuantity) {
     const phaseUploadDiv = document.getElementById('phaseUpload');
 
-    // Clear existing content
     phaseUploadDiv.innerHTML = null;
 
-    // Add new content based on phaseQuantity
     if (phaseQuantity === '2') {
       phaseUploadDiv.innerHTML =
         `<div class="phase-image-upload-container" id="phaseContainer">
@@ -152,13 +137,33 @@ document.addEventListener('DOMContentLoaded', async () => {
             </svg>
           </div>
         </div>
-        <div class="row" >
-          <div class="phase-image-upload-button" data-label-id="image-path-1">Phase 1</div>
-          <p class="label" id="image-path-1"></p>
+        <div class="column">
+          <div class="row" >
+            <div class="phase-image-upload-button" data-label-id="image-path-1">Phase 1</div>
+            <div class="import-custom-select">
+              <select class="scale-select">
+                  <option value="4x">4x</option>
+                  <option value="10x">10x</option>
+                </select>
+            </div>
+          </div>
+          <div class="row" >
+            <p class="label" id="image-path-1"></p>
+          </div>
         </div>
-        <div class="row" >
-          <div class="phase-image-upload-button" data-label-id="image-path-2">Phase 2</div>
-          <p class="label" id="image-path-2"></p>
+        <div class="column">
+          <div class="row" >
+            <div class="phase-image-upload-button" data-label-id="image-path-2">Phase 2</div>
+            <div class="import-custom-select">
+              <select class="scale-select">
+                  <option value="4x">4x</option>
+                  <option value="10x">10x</option>
+                </select>
+            </div>
+          </div>
+          <div class="row" >
+            <p class="label" id="image-path-2"></p>
+          </div>
         </div>
       </div>`;
 
@@ -187,17 +192,47 @@ document.addEventListener('DOMContentLoaded', async () => {
             
           </div>
         </div>
-        <div class="row" >
-          <div class="phase-image-upload-button" data-label-id="image-path-1">Phase 1</div>
-          <p class="label" id="image-path-1"></p>
+        <div class="column">
+          <div class="row" >
+            <div class="phase-image-upload-button" data-label-id="image-path-1">Phase 1</div>
+            <div class="import-custom-select">
+              <select class="scale-select">
+                  <option value="4x">4x</option>
+                  <option value="10x">10x</option>
+                </select>
+            </div>
+          </div>
+          <div class="row" >
+            <p class="label" id="image-path-1"></p>
+          </div>
         </div>
-        <div class="row" >
-          <div class="phase-image-upload-button" data-label-id="image-path-2" >Phase 2</div>
-          <p class="label" id="image-path-2"></p>
+        <div class="column">
+          <div class="row" >
+            <div class="phase-image-upload-button" data-label-id="image-path-2">Phase 2</div>
+            <div class="import-custom-select">
+              <select class="scale-select">
+                  <option value="4x">4x</option>
+                  <option value="10x">10x</option>
+                </select>
+            </div>
+          </div>
+          <div class="row" >
+            <p class="label" id="image-path-2"></p>
+          </div>
         </div>
-        <div class="row" >
-          <div class="phase-image-upload-button" data-label-id="image-path-3" >Phase 1</div>
-          <p class="label" id="image-path-3"></p>
+        <div class="column">
+          <div class="row" >
+            <div class="phase-image-upload-button" data-label-id="image-path-3">Phase 3</div>
+            <div class="import-custom-select">
+              <select class="scale-select">
+                  <option value="4x">4x</option>
+                  <option value="10x">10x</option>
+                </select>
+            </div>
+          </div>
+          <div class="row" >
+            <p class="label" id="image-path-3"></p>
+          </div>
         </div>
       </div>`;
 
@@ -212,7 +247,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Listen for changes on the radio buttons
   document.querySelectorAll('.choicebox-container input[type="radio"][name="radio"]').forEach(radio => {
     radio.addEventListener('change', function () {
       updatePhaseUpload(this.value);
@@ -240,7 +274,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     await eel.add_project(projectName, owner, description)();
-    await eel.create_new_folder(projectName)();
     projects.push(newProject);
 
     updateProjectList();
@@ -250,52 +283,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     showProjectList();
   });
 
-  function updateProjectList() {
-    var projectList = document.getElementById('projects');
-    var projectSelect = document.getElementById('project-select');
-
-
-
-    if (!projectList) {
-      console.error('The "projects" element does not exist.');
-      return;
-    }
-    projectList.innerHTML = '';
-    projectSelect.innerHTML = '<option value="">Select a project</option>';
-
-
-    // Add each project to the project list
-    for (var i = 0; i < projects.length; i++) {
-      console.log(projects[i]);
-      // Create a new list item element for the project with project name title and owner as text and createdAt as text
-      var projectItem = document.createElement('li');
-      projectItem.innerHTML =
-        `<div class="header">
-      <p class="project-name">${projects[i].name}</p>
-      <p class="project-owner">${projects[i].owner}</p>
-    </div>
-    <div class="separator"></div>
-    <div class="content">
-      <p class="project-description">${projects[i].description}</p>
-    </div>
-    <div class="footer">
-      <div class="project-actions">
-        <button class="project-action" onclick="overviewProject('${projects[i].name}')">Overview</button>
-        <button class="project-action" style="background-color:#d83131; color:black;" onclick="deleteProject('${projects[i].name}')">Delete</button>
-      </div>
-      <p class="project-created-at">${projects[i].timestamp}</p>
-    </div>`;
-
-      projectList.appendChild(projectItem);
-      projectSelect.innerHTML += `<option value="${projects[i].name}">${projects[i].name}</option>`;
-    }
-  }
-
-
 });
 
 // project
-
 
 async function deleteProject(projectName) {
   await eel.delete_project(projectName)();
@@ -307,16 +297,10 @@ function updateProjectList() {
   var projectList = document.getElementById('projects');
   var projectSelect = document.getElementById('project-select');
 
-  if (!projectList) {
-    console.error('The "projects" element does not exist.');
-    return;
-  }
   projectList.innerHTML = '';
   projectSelect.innerHTML = '<option value="">Select a project</option>';
 
-  // Add each project to the project list
   for (var i = 0; i < projects.length; i++) {
-    // Create a new list item element for the project with project name title and owner as text and createdAt as text
     var projectItem = document.createElement('li');
     projectItem.innerHTML =
       `<div class="header">
@@ -339,17 +323,6 @@ function updateProjectList() {
   }
 }
 
-function createFolder() {
-  var folderName = document.getElementById('projectName').value;
-  eel.create_new_folder(folderName);  // Call the Python function
-}
-
-
-async function fetchProjects() {
-  let response = await eel.get_projects()();
-  return response;
-}
-
 function showProjectList() {
   document.getElementById('projectPage1').style.display = 'flex';
   document.getElementById('projectPage2').style.display = 'none';
@@ -360,14 +333,10 @@ function showAddScreenProject() {
   document.getElementById('projectPage2').style.display = 'flex';
 }
 
-function checkPhaseImagesAreUploaded() {
+function checkPhaseImagesAreUploaded() { // 
   var phaseContainer = document.getElementById('phaseUpload');
-  // this holds the value of path of image <p class="label" id="uploadedImageName"></p>
-  console.log("checkPhaseImagesAreUploaded -> phaseContainer", phaseContainer)
   if (phaseContainer.hasChildNodes()) {
     var labels = phaseContainer.getElementsByClassName('label');
-    console.log("checkPhaseImagesAreUploaded -> labels", labels)
-
     if (labels.length === 0) {
       alert('Select the number of phases first.');
       return false;
@@ -380,22 +349,16 @@ function checkPhaseImagesAreUploaded() {
     }
     return true;
   }
-
-
   return false;
 }
 
 
-function triggerImageSelection(labelId) {
-  // Get the label element by its id
+function triggerImageSelection(labelId) { // 
   var label = document.getElementById(labelId);
-
-  // Make sure the label element exists
   if (!label) {
     console.error('Label element not found:', labelId);
     return;
   }
-
   eel.select_image()(function (result) {
     if (result) {
       console.log('File selected:', result);

@@ -17,7 +17,7 @@ class DatabaseSingleton:
         tables = {
             "projects": """
                 CREATE TABLE IF NOT EXISTS projects (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    id INTEGER PRIMARY KEY,
                     name VARCHAR(255),
                     owner VARCHAR(255),
                     desc TEXT,
@@ -26,16 +26,29 @@ class DatabaseSingleton:
             """,
             "cells": """
                 CREATE TABLE IF NOT EXISTS cells (
-                    cell_id INT, 
-                    project_id INTEGER,
-                    phase INT,
-                    image_name VARCHAR(255),
-                    area_mm2 REAL,
-                    perimeter_mm REAL,
-                    diameter_mm REAL,
-                    class INTEGER, 
-                    PRIMARY KEY (cell_id, phase),           
+                    cell_id INTEGER PRIMARY KEY,
+                    project_id INT,
+                    projectName VARCHAR(255),
+                    name VARCHAR(255),
+                    phaseNumber INT,        
                     FOREIGN KEY (project_id) REFERENCES projects (id)
+                );
+            """,
+            "cellPhases": """
+                CREATE TABLE IF NOT EXISTS cellPhases (
+                    phase_id INTEGER PRIMARY KEY,
+                    cell_id INT,
+                    phaseNumber INT,
+                    area_mm2 FLOAT,
+                    perimeter_mm FLOAT,
+                    diameter_mm FLOAT,
+                    roundness FLOAT,
+                    aspectRatio FLOAT,
+                    solidity FLOAT,
+                    convexity FLOAT,
+                    particleCount INT,
+                    scaleValue INT,
+                    FOREIGN KEY (cell_id) REFERENCES cells (cell_id)
                 );
             """,
             

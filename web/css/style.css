@@ -255,6 +255,50 @@ img {
     gap: 20px;
 }
 
+.import-custom-select {
+    position: relative;
+}
+
+.import-custom-select select {
+    appearance: none;
+    /*  safari  */
+    -webkit-appearance: none;
+    /*  other styles for aesthetics */
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 0.5em 2em 0.5em 1em;
+    background-color: #fff;
+    border: 1px solid #caced1;
+    border-radius: 0.25rem;
+    color: #000;
+    cursor: pointer;
+}
+
+.import-custom-select .import-custom-select::before,
+.import-custom-select .import-custom-select::after {
+    --size: 0.3rem;
+    content: "";
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+}
+
+.import-custom-select .import-custom-select::before {
+    border-left: var(--size) solid transparent;
+    border-right: var(--size) solid transparent;
+    border-bottom: var(--size) solid black;
+    top: 40%;
+}
+
+.import-custom-select .import-custom-select::after {
+    border-left: var(--size) solid transparent;
+    border-right: var(--size) solid transparent;
+    border-top: var(--size) solid black;
+    top: 55%;
+}
+
+
+
 /* project page */
 
 .project-list {
@@ -430,7 +474,6 @@ img {
     top: 55%;
 }
 
-
 .phase-image-upload-container {
     display: flex;
     flex-direction: column;
@@ -443,16 +486,22 @@ img {
         -5px -5px 10px rgba(255, 255, 255, 0.5);
 }
 
-.phase-image-upload-container .row {
+.phase-image-upload-container .column .row {
     display: flex;
-    min-width: 500px;
-    max-width: 600px;
-    position: relative;
     align-items: center;
+    gap: 10px;
+}
+
+.phase-image-upload-container .column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
 }
 
 
-.phase-image-upload-container .row .phase-image-upload-button {
+
+.phase-image-upload-button {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -461,18 +510,22 @@ img {
     color: white;
     border: none;
     border-radius: 4px;
-    padding: 6px;
+    padding: 10px 20px;
 }
 
-.phase-image-upload-container .row .label {
+.phase-image-upload-container .column .row .label {
     color: #111;
-    width: 150px;
     padding: 10px;
     border-radius: 4px;
     font-size: large;
-    display: flex;
-    align-items: center;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    flex: 2;
 }
+
 
 /* The Modal (background) */
 .modal {
@@ -577,6 +630,7 @@ img {
 .img-container {
     width: 100%;
     margin-bottom: 20px;
+    max-height: 600px;
 }
 
 .hidden {

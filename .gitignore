@@ -6,3 +6,4 @@ con.db
 .DS_Store
 /database/__pycache__
 /prework/__pycache__
+/projects/** 

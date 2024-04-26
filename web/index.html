@@ -28,9 +28,12 @@
                             const tiff = new Tiff({buffer: buffer});
                             const canvas = tiff.toCanvas();
                             canvas.id = "image";
+                            // set max width and height as 800px
+                            
                             const imgContainer = document.querySelector('.img-container');
                             imgContainer.innerHTML = ""; // Clear the container
                             imgContainer.appendChild(canvas);
+
             
                             // Initialize Cropper on the new canvas
                             if (cropper) {
@@ -161,6 +164,10 @@
                         </div>
                     </div>
                     <div class="row">
+                        <p>Name</p>
+                        <input type="text" id="cellName" />
+                    </div>
+                    <div class="row">
                         <p>Phase Quantity</p>
                         <div class="choicebox">
                             <label class="choicebox-container">2
@@ -207,7 +214,6 @@
             <div>
                 <ul class="project-list" id="projects"></ul>
             </div>
-            
         </div>
         <div id="projectPage2" class="section" style="display: none;">
             <div class="buttonContainer">
@@ -241,7 +247,6 @@
         </div>
     </div>
     <div class="page" id="Crop" style="display: none;">
-        
         <div class="toolbox">
             <input type="file" id="inputImage" accept="image/*" style="display: none;">
             <button id="select" style="display: flex; gap: 4px; align-items:center;">
@@ -271,12 +276,9 @@
         </div>
         <div class="img-container">
         </div>
-    
     </div>
 
     <div id="myModal" class="modal">
-        
-        <!-- Modal content -->
         <div class="modal-content">
             <div class="row" style="display: flex; flex:1; justify-content:end; width:100%; align-items:center">
                 <span class="close">&times;</span>
