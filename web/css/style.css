@@ -32,8 +32,100 @@ img {
     display: flex;
     flex-direction: column;
     height: 100vh;
+} 
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    margin-top: 2rem;
+    text-align: center;
+    
 }
 
+.explanation {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.help {
+    font-size: 1rem;
+    color: #666;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 0;
+    padding: 0.5rem;
+    transition: margin-left 0.5s; /* Added transition property */
+    margin-left: 0; /* Initial margin-left value */
+}
+
+
+.steps-list li {
+    margin-top: 4rem;
+    margin-bottom: 0.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0.5rem;
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
+        -5px -5px 10px rgba(255, 255, 255, 0.5);
+    max-width: 600px;
+    
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.steps-list {
+    counter-reset: step;
+    padding-left: 1rem;
+}
+
+.steps-list li {
+    margin-bottom: 1.5rem;
+}
+
+.steps-list li::before {
+    content: counter(step, decimal-leading-zero);
+    counter-increment: step;
+    width: 3rem;
+    display: inline-block;
+    font-size: 1.25rem;
+    margin-right: 1rem;
+    text-align: right;
+    font-weight: bold;
+}
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    .steps-list li::before {
+        content: counter(step, lower-alpha) ".";
+        counter-increment: step;
+        width: 2rem;
+        display: inline-block;
+        font-size: 1rem;
+        margin-right: 0.5rem;
+        text-align: right;
+        font-weight: bold;
+    }
+}
 .page {
     display: flex;
     flex: 1;
