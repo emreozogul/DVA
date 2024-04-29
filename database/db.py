@@ -48,6 +48,7 @@ class DatabaseSingleton:
                     convexity FLOAT,
                     particleCount INT,
                     scaleValue INT,
+                    viability VARCHAR(20),
                     FOREIGN KEY (cell_id) REFERENCES cells (cell_id)
                 );
             """,

@@ -18,18 +18,18 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 # Takes the folder path as input and returns the path to the latest CSV file in that folder.
 def get_latest_csv_file():
     # Get a list of all files in the folder
-    files = os.listdir(os.path.join(os.getcwd(), 'data'))
+    files = os.listdir(os.path.join(os.getcwd(), 'prework/data'))
     print(files)
 
     # Filter out only CSV files
     csv_files = [file for file in files if file.endswith('.csv')]
 
     # Sort the CSV files based on their timestamps
-    sorted_files = sorted(csv_files, key=lambda x: os.path.getmtime(os.path.join('data', x)), reverse=True)
+    sorted_files = sorted(csv_files, key=lambda x: os.path.getmtime(os.path.join('prework/data', x)), reverse=True)
 
     if sorted_files:
         # Return the path to the latest CSV file
-        return os.path.join('data', sorted_files[0])
+        return os.path.join('prework/data', sorted_files[0])
     else:
         return None
 
@@ -70,16 +70,20 @@ df_encoded = pd.concat([data, one_hot_df], axis=1)
 # Drop the original categorical columns
 df_encoded = df_encoded.drop(categorical_column, axis=1)
 
+target_columns = ['Target_Healthy', 'Target_Slightly Death', 'Target_Extremely Death']
+remaining_columns = [col for col in df_encoded.columns if col not in target_columns]
+df_encoded = df_encoded[remaining_columns + target_columns]
+
 num_cols = [col for col in df_encoded.columns if
             col not in ['Target_Extremely Death', 'Target_Healthy', 'Target_Slightly Death']]
 
 min_max_scaler = MinMaxScaler()
 df_encoded[num_cols] = min_max_scaler.fit_transform(df_encoded[num_cols])
 
-df_encoded[num_cols] = normalize(df_encoded[num_cols])
+#df_encoded[num_cols] = normalize(df_encoded[num_cols])
 
-standard_scaler = StandardScaler()
-df_encoded[num_cols] = standard_scaler.fit_transform(df_encoded[num_cols])
+#standard_scaler = StandardScaler()
+#df_encoded[num_cols] = standard_scaler.fit_transform(df_encoded[num_cols])
 
 # Let's create a loop to check for outliers
 for column in df_encoded.columns[:-3]:
@@ -107,7 +111,10 @@ for column in df_encoded.columns[:-3]:
 
 # Separate independent variables (X) and target variable (y)
 X = df_encoded.drop(columns=['Target_Extremely Death', 'Target_Healthy', 'Target_Slightly Death'])
-y = df_encoded[['Target_Extremely Death', 'Target_Healthy', 'Target_Slightly Death']]
+y = df_encoded[['Target_Healthy', 'Target_Slightly Death', 'Target_Extremely Death']]
+print(X)
+
+print(y)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
 
@@ -217,3 +224,31 @@ plt.figure(figsize=(10, 8))
 sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
 plt.title('Correlation Matrix')
 #plt.show()
+
+
+def predict_target(X_test):
+    model = models.get('Decision Tree')
+
+    # Define feature names
+    feature_names = ['Area_mm2', 'Perimeter_mm', 'Diameter_mm', 'Roundness', 'Aspect_Ratio', 'Solidity', 'Convexity',
+                     'Particle_Count']
+
+    # Create a DataFrame for test data with feature names
+    X_test_df = pd.DataFrame(X_test, columns=feature_names)
+
+    # Scale test data using the same MinMaxScaler
+    X_test_scaled = min_max_scaler.transform(X_test_df)
+
+    # Make predictions
+    y_pred = model.predict(X_test_scaled)
+
+    # Determine the target string based on the predicted index
+    target_strings = {
+        0: 'Healthy',
+        1: 'Slightly Death',
+        2: 'Extremely Death'
+    }
+    index = y_pred.argmax()
+    return target_strings[index]
+
+

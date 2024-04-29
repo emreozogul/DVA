@@ -1,9 +1,9 @@
 from database.db import DatabaseSingleton
 from database.operations import DatabaseOperations
 import eel
-import numpy as np
 import wx
 from prework.imageProcessing2 import process_image_4x, process_image_10x
+from prework.model import predict_target
 
 db = DatabaseSingleton()
 conn = db.get_connection()
@@ -62,11 +62,13 @@ def import_images(project_name, cell_name,  image_paths, scaleValues):
             area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity, particle_count = process_image_4x(image_path)
         elif scaleValue == "10x":
             area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity, particle_count = process_image_10x(image_path)
+
+        X = [[area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity,
+             particle_count]]
+        viability = predict_target(X)
         
-        ops.create_cell_phase(id, phase_number , area_mm2, perimeter_mm, diameter_mm, roundness,aspect_ratio, solidity, convexity, particle_count, scaleValue)
+        ops.create_cell_phase(id, phase_number , area_mm2, perimeter_mm, diameter_mm, roundness,aspect_ratio, solidity, convexity, particle_count, scaleValue, viability)
         conn.commit()
-    
-    #machine learning model comes here 
     
 @eel.expose
 def get_cells_by_project_name(project_name):

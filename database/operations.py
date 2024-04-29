@@ -64,10 +64,10 @@ class DatabaseOperations:
         cursor.execute("DELETE FROM cells WHERE cell_id = ?", (cell_id,))
         conn.commit()
 
-    def create_cell_phase(self, cell_id, phase_number, area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity, particle_count, scale_value):
+    def create_cell_phase(self, cell_id, phase_number, area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity, particle_count, scale_value, viability):
         conn = self.db.get_connection()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO cellPhases (cell_id, phaseNumber, area_mm2, perimeter_mm, diameter_mm, roundness, aspectRatio, solidity, convexity, particleCount, scaleValue) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (cell_id, phase_number, area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio ,solidity, convexity, particle_count, scale_value))
+        cursor.execute("INSERT INTO cellPhases (cell_id, phaseNumber, area_mm2, perimeter_mm, diameter_mm, roundness, aspectRatio, solidity, convexity, particleCount, scaleValue, viability) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (cell_id, phase_number, area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio ,solidity, convexity, particle_count, scale_value, viability))
         conn.commit()
 
     def read_cell_phases(self):
@@ -109,7 +109,8 @@ class DatabaseOperations:
                     "solidity": phase[8],
                     "convexity": phase[9],
                     "particle_count": phase[10],
-                    "scale_value": phase[11]
+                    "scale_value": phase[11],
+                    "viability": phase[12]
                 })
             project_cells.append(cell_phases)
         return project_cells
