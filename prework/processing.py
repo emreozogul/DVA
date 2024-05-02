@@ -5,8 +5,6 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
-import subprocess
-import sys
 
 # Calculate the features of a contour
 def calculate_features(contour, scale_factor):
@@ -56,7 +54,7 @@ def process_image(image_path, scale_factor):
         return None, None
     
 # Process 4x images and return the features and contoured images
-def process_images_4x(image_dir, scale_factor):
+def process_images_4x(image_dir, scale_factor_4x):
     image_paths = [os.path.join(image_dir, img) for img in os.listdir(image_dir) if img.endswith(('.tif', '.jpg', '.png')) and not img.startswith('.')]
     features_4x = []
     contoured_images_4x = []
@@ -73,21 +71,18 @@ def process_images_4x(image_dir, scale_factor):
             largest_contour = max(contours, key=cv2.contourArea)
             contoured_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
             cv2.drawContours(contoured_image, [largest_contour], -1, (0, 255, 0), 3)
-            features = calculate_features(largest_contour, scale_factor)
+            features = calculate_features(largest_contour, scale_factor_4x)
             particle_count = count_particles_4x(cv2.cvtColor(image, cv2.COLOR_GRAY2BGR))
             features_4x.append(features + (particle_count,))
             contoured_images_4x.append(contoured_image)
     return features_4x, contoured_images_4x, [os.path.basename(path) for path in image_paths]
 
-# Count the number of particles in an image
 def count_particles(image, min_area=100, max_area=5000, circularity_thresh=0.5):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
+    edges = cv2.Canny(gray, 30, 120)
     kernel = np.ones((3, 3), np.uint8)
-    opened = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
-    contours, _ = cv2.findContours(opened, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
+    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=2)
+    contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     particle_count = 0
 
     for contour in contours:
@@ -101,13 +96,12 @@ def count_particles(image, min_area=100, max_area=5000, circularity_thresh=0.5):
 
     return particle_count
 
-def count_particles_4x(image, min_area=100, max_area=2500, circularity_thresh=0.3):
+def count_particles_4x(image, min_area=50, max_area=2500, circularity_thresh=0.5):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
+    edges = cv2.Canny(gray, 30, 120)
     kernel = np.ones((3, 3), np.uint8)
-    opened = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
-    contours, _ = cv2.findContours(opened, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=2)
+    contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     particle_count = 0
 
@@ -178,10 +172,9 @@ def write_features_to_csv_4x(features, image_names, output_dir, target_values_4x
 
 # Set parameters for image processing.    
 scale_factor = 0.0786
-
+scale_factor_4x = 0.1965
 # Get the directory of the current script
 current_dir = os.path.dirname(os.path.abspath(__file__))
-
 # Construct paths relative to the current directory
 spheroid_image_dir = os.path.join(current_dir, 'assets', 'images')
 spheroid_image_dir_4x = os.path.join(current_dir, 'assets', 'images4x')
@@ -200,7 +193,7 @@ target_values_4x = ""
 target_values = ""
 
 # Process 4x images and write the features to a CSV file.
-features_4x, contoured_images_4x, image_names_4x = process_images_4x(spheroid_image_dir_4x, scale_factor)
+features_4x, contoured_images_4x, image_names_4x = process_images_4x(spheroid_image_dir_4x, scale_factor_4x)
 csv_file_path_4x = write_features_to_csv_4x(features_4x, image_names_4x, output_dir, target_values_4x)
 print(f"4x features CSV file saved to: {csv_file_path_4x}")
 

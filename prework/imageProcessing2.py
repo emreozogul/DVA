@@ -27,7 +27,7 @@ def calculate_features(contour, scale_factor):
 
     return area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity
 
-def process_image_10x(image_path, scale_factor=0.0756):
+def process_image_10x(image_path, scale_factor=0.0786):
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -46,7 +46,7 @@ def process_image_10x(image_path, scale_factor=0.0756):
         return None, None
     
 # Process 4x images and return the features and contoured images
-def process_image_4x(image_path, scale_factor=0.189):
+def process_image_4x(image_path, scale_factor=0.1965):
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     edges = cv2.Canny(image, 30, 120)
     kernel = np.ones((5, 5), np.uint8)
@@ -64,12 +64,10 @@ def process_image_4x(image_path, scale_factor=0.189):
 
 def count_particles(image, min_area=100, max_area=5000, circularity_thresh=0.5):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
+    edges = cv2.Canny(gray, 30, 120)
     kernel = np.ones((3, 3), np.uint8)
-    opened = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
-    contours, _ = cv2.findContours(opened, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
+    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=2)
+    contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     particle_count = 0
 
     for contour in contours:
@@ -83,13 +81,12 @@ def count_particles(image, min_area=100, max_area=5000, circularity_thresh=0.5):
 
     return particle_count
 
-def count_particles_4x(image, min_area=50, max_area=2500, circularity_thresh=0.2):
+def count_particles_4x(image, min_area=50, max_area=2500, circularity_thresh=0.5):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 2)
+    edges = cv2.Canny(gray, 30, 120)
     kernel = np.ones((3, 3), np.uint8)
-    opened = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
-    contours, _ = cv2.findContours(opened, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=2)
+    contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     particle_count = 0
 
@@ -101,5 +98,3 @@ def count_particles_4x(image, min_area=50, max_area=2500, circularity_thresh=0.2
 
             if circularity >= circularity_thresh:
                 particle_count += 1
-
-    return particle_count
