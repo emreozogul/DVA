@@ -46,7 +46,13 @@ def check_project_exists(project_name):
         return True
     else:
         return False
+
+@eel.expose
+def get_project_data(project_name):
+    cellsData = ops.get_cells_by_project_name(project_name)
+    return cellsData
     
+
 @eel.expose
 def import_images(project_name, cell_name,  image_paths, scaleValues):
     length = len(image_paths)

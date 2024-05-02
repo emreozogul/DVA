@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     scaleSelects.forEach(function (select) {
       scaleValues.push(select.querySelector('.scale-select').value);
     });
-    console.log('scaleValues:', scaleValues);
     if (projectName === '' || projectName === undefined || projectName === null || projectName === "Select a project") {
       alert('Select a project first.');
       return;
@@ -370,12 +369,36 @@ function triggerImageSelection(labelId) { //
 }
 
 function checkProjectExists(projectName) {
-  projects.map(project => console.log(project.name));
-  let isExists = projects.find(project => project.name === projectName);
-  console.log("checkProjectExists -> isExists", isExists)
-  return isExists;
+  return projects.find(project => project.name === projectName);
 }
 
+async function overviewProject(projectName) {
+  try {
+    const projectData = await eel.get_project_data(projectName)();  // Properly await the asynchronous Eel call
 
+    const tableContent = document.getElementById('tableContent');
+    tableContent.innerHTML = '';
+    document.getElementById('projectPage1').style.display = 'none';
+    document.getElementById('projectPage2').style.display = 'none';
+    document.getElementById('projectPageOverview').style.display = 'flex';
 
-
+    if (Array.isArray(projectData)) {  // Check if projectData is indeed an array
+      projectData.map(data => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${data.cellName}</td>
+          <td>${data.area}</td>
+          <td>${data.perimeter}</td>
+          <td>${data.roundness}</td>
+          <td>${data.particleCount}</td>
+          <td>${data.viability}</td>
+        `;
+        tableContent.appendChild(row);
+      });
+    } else {
+      console.error('Expected an array for project data, received:', projectData);
+    }
+  } catch (error) {
+    console.error('Failed to fetch project data:', error);
+  }
+}
