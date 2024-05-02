@@ -35,7 +35,7 @@ async function loadProjects() {
   return projectData;
 }
 var projects = [];
-
+var activeProject = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   projects = await loadProjects();
@@ -95,6 +95,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     }
 
+  });
+
+  document.getElementById("exportBtn").addEventListener('click', async function () {
+    let res = await eel.export_data(activeProject)();
+    if (res) {
+      alert('Data exported successfully');
+    }
+    else {
+      alert('Failed to export data');
+    }
   });
 
   var modal = document.getElementById("myModal");
@@ -375,7 +385,7 @@ function checkProjectExists(projectName) {
 async function overviewProject(projectName) {
   try {
     const projectData = await eel.get_project_data(projectName)();  // Properly await the asynchronous Eel call
-
+    activeProject = projectName;
     const tableContent = document.getElementById('tableContent');
     tableContent.innerHTML = '';
     document.getElementById('projectPage1').style.display = 'none';
@@ -385,11 +395,15 @@ async function overviewProject(projectName) {
     if (Array.isArray(projectData)) {  // Check if projectData is indeed an array
       projectData.map(data => {
         const row = document.createElement('tr');
+        let dataRoundessOverHundreds = data.roundness * 100;
+        dataRoundessOverHundreds = dataRoundessOverHundreds.toFixed(2);
+        let dataArea = data.area.toFixed(2);
+        let dataPerimeter = data.perimeter.toFixed(2);
         row.innerHTML = `
           <td>${data.cellName}</td>
-          <td>${data.area}</td>
-          <td>${data.perimeter}</td>
-          <td>${data.roundness}</td>
+          <td>${dataArea}</td>
+          <td>${dataPerimeter}</td>
+          <td>${dataRoundessOverHundreds}%</td>
           <td>${data.particleCount}</td>
           <td>${data.viability}</td>
         `;

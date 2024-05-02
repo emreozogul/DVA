@@ -2,6 +2,7 @@ from database.db import DatabaseSingleton
 from database.operations import DatabaseOperations
 import eel
 import wx
+import pandas as pd
 from prework.imageProcessing2 import process_image_4x, process_image_10x
 from prework.model import predict_target
 
@@ -80,8 +81,14 @@ def import_images(project_name, cell_name,  image_paths, scaleValues):
 def get_cells_by_project_name(project_name):
     cells = ops.get_cells_by_project_name(project_name)
     return cells
-        
-    
+
+@eel.expose
+def export_data(project_name):
+    data = ops.getDataOfProject(project_name)
+    column_names = ["project_id", "project_name", "cell_id", "cell_name", "phase_id", "phaseNumber", "area_mm2", "perimeter_mm", "diameter_mm", "roundness", "aspectRatio", "solidity", "convexity", "particleCount", "scaleValue", "viability"]
+    df = pd.DataFrame(data, columns=column_names)
+    df.to_csv(f"{project_name}.csv", index=False)
+    return "Success"
 if __name__ == '__main__':
     eel.init('web')  
     eel.init('web', allowed_extensions=['.js', '.html', '.css'])
