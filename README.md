@@ -5,7 +5,7 @@ This project, DVA, develops a desktop application to classify drug-treated cance
 
 ## Features
 - **Automated Analysis**: Automatically determine the viability of cancer cells from images.
-- **Advanced Image Processing**: Includes Threshold algorithm, Contour Detection etc. to prepare images for machine learning analysis.
+- **Advanced Image Processing**: Includes Threshold algorithms, Contour Detection etc. to prepare images for machine learning analysis.
 - **Incremental Machine Learning Model**: Uses an Incremental Machine learning model that adapts and improves over time.
 - **User-Friendly Interface**: Designed to be accessible for both technical and non-technical users.
 
