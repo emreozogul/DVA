@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ```
 
 
-## Authors and Acknowledgment
+## Authors and Acknowledgement
 - Emre Evcin
 - Emre Özoğul
 - Mehmet Eren Sönmez
