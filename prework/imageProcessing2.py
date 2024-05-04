@@ -27,6 +27,7 @@ def calculate_features(contour, scale_factor):
 
     return area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity
 
+
 def process_image_10x(image_path, scale_factor=0.0786):
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -39,12 +40,14 @@ def process_image_10x(image_path, scale_factor=0.0786):
     contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
-        area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity = calculate_features(largest_contour, scale_factor)
+        area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity = calculate_features(
+            largest_contour, scale_factor)
         particle_count = count_particles(image)
         return area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity, particle_count
     else:
         return None, None
-    
+
+
 # Process 4x images and return the features and contoured images
 def process_image_4x(image_path, scale_factor=0.1965):
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
@@ -54,7 +57,8 @@ def process_image_4x(image_path, scale_factor=0.1965):
     contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
-        area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity  = calculate_features(largest_contour, scale_factor)
+        area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity = calculate_features(
+            largest_contour, scale_factor)
         particle_count = count_particles_4x(cv2.cvtColor(image, cv2.COLOR_GRAY2BGR))
         return area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity, particle_count
 
@@ -62,7 +66,7 @@ def process_image_4x(image_path, scale_factor=0.1965):
         return None, None
 
 
-def count_particles(image, min_area=100, max_area=5000, circularity_thresh=0.5):
+def count_particles(image, min_area=35, max_area=6000, circularity_thresh=0.3):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 30, 120)
     kernel = np.ones((3, 3), np.uint8)
@@ -81,11 +85,12 @@ def count_particles(image, min_area=100, max_area=5000, circularity_thresh=0.5):
 
     return particle_count
 
-def count_particles_4x(image, min_area=50, max_area=2500, circularity_thresh=0.5):
+
+def count_particles_4x(image, min_area=50, max_area=4500, circularity_thresh=0.37):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 30, 120)
-    kernel = np.ones((3, 3), np.uint8)
-    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=2)
+    kernel = np.ones((5, 5), np.uint8)
+    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=3)
     contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     particle_count = 0
@@ -98,3 +103,5 @@ def count_particles_4x(image, min_area=50, max_area=2500, circularity_thresh=0.5
 
             if circularity >= circularity_thresh:
                 particle_count += 1
+
+    return particle_count

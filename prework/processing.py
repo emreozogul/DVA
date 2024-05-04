@@ -64,7 +64,7 @@ def process_images_4x(image_dir, scale_factor_4x):
         if image is None:
             print(f"Error: Unable to load image '{path}'")
         edges = cv2.Canny(image, 30, 120)
-        kernel = np.ones((11, 11), np.uint8)
+        kernel = np.ones((5, 5), np.uint8)
         closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=3)
         contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if contours:
@@ -77,7 +77,7 @@ def process_images_4x(image_dir, scale_factor_4x):
             contoured_images_4x.append(contoured_image)
     return features_4x, contoured_images_4x, [os.path.basename(path) for path in image_paths]
 
-def count_particles(image, min_area=100, max_area=5000, circularity_thresh=0.5):
+def count_particles(image, min_area=35, max_area=6000, circularity_thresh=0.3):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 30, 120)
     kernel = np.ones((3, 3), np.uint8)
@@ -96,11 +96,11 @@ def count_particles(image, min_area=100, max_area=5000, circularity_thresh=0.5):
 
     return particle_count
 
-def count_particles_4x(image, min_area=50, max_area=2500, circularity_thresh=0.5):
+def count_particles_4x(image, min_area=50, max_area=4500, circularity_thresh=0.37):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 30, 120)
     kernel = np.ones((3, 3), np.uint8)
-    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=2)
+    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel, iterations=3)
     contours, _ = cv2.findContours(closing, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     particle_count = 0
@@ -138,7 +138,7 @@ def write_features_to_csv_mm(features, image_names, output_dir, target_values):
                     'Solidity': feature[5],
                     'Convexity': feature[6],
                     'Particle_Count': feature[7],
-                    'Target': 'Extremely Death'
+                    'Target': 'Healthy'
                 })
     return csv_file_path
 
@@ -166,7 +166,7 @@ def write_features_to_csv_4x(features, image_names, output_dir, target_values_4x
                 'Solidity': feature[5],
                 'Convexity': feature[6],
                 'Particle_Count': feature[7],
-                'Target': 'Extremely Death'
+                'Target': 'Healthy'
             })
     return csv_file_path
 
@@ -196,6 +196,9 @@ target_values = ""
 features_4x, contoured_images_4x, image_names_4x = process_images_4x(spheroid_image_dir_4x, scale_factor_4x)
 csv_file_path_4x = write_features_to_csv_4x(features_4x, image_names_4x, output_dir, target_values_4x)
 print(f"4x features CSV file saved to: {csv_file_path_4x}")
+df = pd.read_csv(csv_file_path_4x)
+mean_particle_count = df['Particle_Count'].mean()
+print("Mean Particle Count:", mean_particle_count)
 
 # Process each image and store the features in a list.
 for img_name in image_names:
@@ -210,9 +213,11 @@ if len(spheroid_features_mm) == len(image_names) and spheroid_features_mm:
     print(f"CSV file saved to: {csv_file_path_mm}")
 
     df = pd.read_csv(csv_file_path_mm)
-    print(df[['Image_Name', 'Area_mm2','Perimeter_mm', 'Diameter_mm', 'Target']])
+    mean_particle_count = df['Particle_Count'].mean()
+    print("Mean Particle Count:", mean_particle_count)
+    #print(df[['Image_Name', 'Area_mm2','Perimeter_mm', 'Diameter_mm', 'Target']])
 
-for i, (feature, contoured_image) in enumerate(spheroid_features_mm):
+""" for i, (feature, contoured_image) in enumerate(spheroid_features_mm):
     img_name = image_names[i]
     original_img_path = os.path.join(spheroid_image_dir, img_name)
     original_img = cv2.imread(original_img_path, cv2.IMREAD_UNCHANGED)
@@ -224,10 +229,10 @@ for i, (feature, contoured_image) in enumerate(spheroid_features_mm):
     if contoured_image is None:
         print(f"Error: Contoured image is None for '{img_name}'")
         continue
- 
+
     plt.figure(figsize=(12, 6))
     original_img = cv2.imread(os.path.join(spheroid_image_dir, img_name), cv2.IMREAD_UNCHANGED)
-    
+
     plt.subplot(1, 2, 1)
     plt.imshow(cv2.cvtColor(original_img, cv2.COLOR_BGR2RGB))
     plt.title(f'Original Image - {img_name}')
@@ -240,7 +245,7 @@ for i, (feature, contoured_image) in enumerate(spheroid_features_mm):
 
     plt.show()
 
-#Show 4x images with contours drawn on them
+# Show 4x images with contours drawn on them
 for i, contoured_image in enumerate(contoured_images_4x):
     img_name = image_names_4x[i]
     original_img_path = os.path.join(spheroid_image_dir_4x, img_name)
@@ -265,7 +270,7 @@ for i, contoured_image in enumerate(contoured_images_4x):
     plt.title('Processed Image')
     plt.axis('off')
 
-    plt.show()
+    plt.show() """
     
 
 # Run the model.py file

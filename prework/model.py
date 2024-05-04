@@ -1,35 +1,48 @@
-# TODO Make the model available from within the application
-# TODO Try increasing accuracy
-# TODO Make the attributes more functional by using various plots, algorithms. Aiming to increase accuracy
-
 import os
 import pandas as pd
-from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler, normalize
-from sklearn.model_selection import train_test_split, GridSearchCV
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
+def predict_target(X_test):
+    # Define feature names
+    feature_names = ['Area_mm2', 'Perimeter_mm', 'Diameter_mm', 'Roundness', 'Aspect_Ratio', 'Solidity', 'Convexity',
+                     'Particle_Count']
+
+    # Create a DataFrame for test data with feature names
+    X_test_df = pd.DataFrame(X_test, columns=feature_names)
+
+    # Scale test data using the same MinMaxScaler
+    X_test_scaled = min_max_scaler.transform(X_test_df)
+
+    # Make predictions
+    y_pred = best_rf_model.predict(X_test_scaled)
+
+    # Determine the target string based on the predicted index
+    target_strings = {
+        0: 'Healthy',
+        1: 'Slightly Death',
+        2: 'Extremely Death'
+    }
+    index = y_pred.argmax()
+    return target_strings[index]
 
 # Takes the folder path as input and returns the path to the latest CSV file in that folder.
 def get_latest_csv_file():
     # Get a list of all files in the folder
-    files = os.listdir(os.path.join(os.getcwd(), 'prework/data'))
+    files = os.listdir(os.path.join(os.getcwd(), 'prework', 'data'))
     print(files)
 
     # Filter out only CSV files
     csv_files = [file for file in files if file.endswith('.csv')]
 
     # Sort the CSV files based on their timestamps
-    sorted_files = sorted(csv_files, key=lambda x: os.path.getmtime(os.path.join('prework/data', x)), reverse=True)
+    sorted_files = sorted(csv_files, key=lambda x: os.path.getmtime(os.path.join('prework', 'data', x)), reverse=True)
 
     if sorted_files:
         # Return the path to the latest CSV file
-        return os.path.join('prework/data', sorted_files[0])
+        return os.path.join('prework', 'data', sorted_files[0])
     else:
         return None
 
@@ -41,15 +54,6 @@ if latest_csv_file:
     data = pd.read_csv(latest_csv_file)
 else:
     print("No CSV files found in the folder.")
-
-# Let's take a look at the first few rows of the dataset
-# print(data.head())
-
-# Check the size of the dataset
-# print("Dataset size:", data.shape)
-
-# Get the statistical summary of the dataset
-# print("Statistical summary of the dataset:\n", data.describe())
 
 # Drop Image Name column
 data = data.drop(columns=['Image_Name'], axis=1)
@@ -80,11 +84,6 @@ num_cols = [col for col in df_encoded.columns if
 min_max_scaler = MinMaxScaler()
 df_encoded[num_cols] = min_max_scaler.fit_transform(df_encoded[num_cols])
 
-#df_encoded[num_cols] = normalize(df_encoded[num_cols])
-
-#standard_scaler = StandardScaler()
-#df_encoded[num_cols] = standard_scaler.fit_transform(df_encoded[num_cols])
-
 # Let's create a loop to check for outliers
 for column in df_encoded.columns[:-3]:
     # Calculate the first and third quartiles
@@ -102,153 +101,50 @@ for column in df_encoded.columns[:-3]:
     # Remove rows with outliers completely
     df_encoded = df_encoded.drop(outliers.index)
 
-    # Print out the outliers and their counts and percentages
-    #print("{}. Outliers:\n".format(column), outliers)
-    #print("{}. Number of Outliers: {}".format(column, outliers.shape[0]))
-    #print("{}. Percentage of Outliers: {:.2f}%\n".format(column, outliers.shape[0] / df_encoded.shape[0] * 100))
-
-#print("After removing rows with outliers, the size of the dataset is:", df_encoded.shape)
-
 # Separate independent variables (X) and target variable (y)
 X = df_encoded.drop(columns=['Target_Extremely Death', 'Target_Healthy', 'Target_Slightly Death'])
 y = df_encoded[['Target_Healthy', 'Target_Slightly Death', 'Target_Extremely Death']]
-print(X)
 
-print(y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+# Define the base estimator
+base_estimator = RandomForestClassifier()
 
-# Define the parameter grid
-# param_grid_decision_tree = {
-#     'max_depth': [None, 5, 10, 20],
-#     'min_samples_split': [2, 5, 10],
-#     'min_samples_leaf': [1, 2, 4],
-#     'criterion': ['gini', 'entropy']
-# }
-#
-# # Define the parameter grid
-# param_grid_knn = {
-#     'n_neighbors': [3, 5, 7, 9, 11],
-#     'weights': ['uniform', 'distance'],
-#     'p': [1, 2]  # 1 for Manhattan distance, 2 for Euclidean distance
-# }
-#
-# # Define the parameter grid
-# param_grid_random_forest = {
-#     'n_estimators': [50, 100, 200],
-#     'max_depth': [None, 10, 20],
-#     'min_samples_split': [2, 5, 10],
-#     'min_samples_leaf': [1, 2, 4],
-#     'bootstrap': [True, False]
-# }
-
-# # Decision Trees
-# dt_model = DecisionTreeClassifier()
-# # Initialize GridSearchCV
-# grid_search = GridSearchCV(dt_model, param_grid_decision_tree, cv=5, scoring='accuracy', n_jobs=-1)
-# # Fit the grid search to the data
-# grid_search.fit(X_train, y_train)
-# # Get the best parameters
-# best_params = grid_search.best_params_
-# # Use the best model
-# best_dt_model = grid_search.best_estimator_
-# # Evaluate the best model
-# dt_pred = best_dt_model.predict(X_test)
-#
-# # K-Nearest Neighbors (KNN)
-# knn_model = KNeighborsClassifier()
-# # Initialize GridSearchCV
-# grid_search = GridSearchCV(knn_model, param_grid_knn, cv=5, scoring='accuracy', n_jobs=-1)
-# # Fit the grid search to the data
-# grid_search.fit(X_train, y_train)
-# # Get the best parameters
-# best_params = grid_search.best_params_
-# # Use the best model
-# best_knn_model = grid_search.best_estimator_
-# # Evaluate the best model
-# knn_pred = best_knn_model.predict(X_test)
-#
-# # Random Forests
-# rf_model = RandomForestClassifier()
-# # Initialize GridSearchCV
-# grid_search = GridSearchCV(rf_model, param_grid_random_forest, cv=5, scoring='accuracy', n_jobs=-1)
-# # Fit the grid search to the data
-# grid_search.fit(X_train, y_train)
-# # Get the best parameters
-# best_params = grid_search.best_params_
-# # Use the best model
-# best_rf_model = grid_search.best_estimator_
-# # Evaluate the best model
-# rf_pred = best_rf_model.predict(X_test)
-
-# TODO Try GridSearchCV for all of them
-
-
-# Function to evaluate model performance
-
-# Evaluate the performance of models
-models = {
-    'Decision Tree': DecisionTreeClassifier(),
-    'Random Forest': RandomForestClassifier(),
-    'KNN': KNeighborsClassifier(),
-    'Neural Network': MLPClassifier(max_iter=1000, random_state=42, solver='adam', learning_rate='adaptive', tol=1e-6, alpha=0.01, learning_rate_init=0.01, hidden_layer_sizes=(100,))
+# Define the parameter grid for Random Forest
+param_grid_rf = {
+    'n_estimators': [200, 300, 400],
+    'max_depth': [10, 20, 25],
+    'min_samples_split': [5, 10, 12],
+    'min_samples_leaf': [2, 4, 5]
 }
 
-# Train and evaluate each model
-for model_name, model in models.items():
-    print(f"Training {model_name}...")
-    model.fit(X_train, y_train)
-    print(f"Evaluating {model_name}...")
-    y_pred = model.predict(X_test)
+# Perform Grid Search with Random Forest
+grid_search_rf = GridSearchCV(base_estimator, param_grid_rf, cv=5, scoring='accuracy', n_jobs=-1)
+grid_search_rf.fit(X_train, y_train)
 
-    # Calculate evaluation metrics
-    accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred, average='weighted')
-    recall = recall_score(y_test, y_pred, average='weighted')
-    f1 = f1_score(y_test, y_pred, average='weighted')
+# Get the best Random Forest model
+best_rf_model = grid_search_rf.best_estimator_
 
-    # Print results
-    print(f"Performance of {model_name}:")
-    print(f"Accuracy: {accuracy:.4f}")
-    print(f"Precision: {precision:.4f}")
-    print(f"Recall: {recall:.4f}")
-    print(f"F1 Score: {f1:.4f}")
-    print("\n")
+# Feature importance from RandomForestClassifier
+feature_importance = best_rf_model.feature_importances_
 
-# Write to CSV file
-#df_encoded.to_csv('data.csv', index=False)
+# Perform cross-validation with the best Random Forest model
+cv_scores = cross_val_score(best_rf_model, X_train, y_train, cv=5, scoring='accuracy', n_jobs=-1)
+average_cv_score = cv_scores.mean()
 
-correlation_matrix = df_encoded.corr()
+# Predict using the best Random Forest model
+y_pred_rf = best_rf_model.predict(X_test)
 
-plt.figure(figsize=(10, 8))
-sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
-plt.title('Correlation Matrix')
-#plt.show()
+# Calculate evaluation metrics for Random Forest
+accuracy_rf = accuracy_score(y_test, y_pred_rf)
+precision_rf = precision_score(y_test, y_pred_rf, average='weighted')
+recall_rf = recall_score(y_test, y_pred_rf, average='weighted')
+f1_rf = f1_score(y_test, y_pred_rf, average='weighted')
 
-
-def predict_target(X_test):
-    model = models.get('Decision Tree')
-
-    # Define feature names
-    feature_names = ['Area_mm2', 'Perimeter_mm', 'Diameter_mm', 'Roundness', 'Aspect_Ratio', 'Solidity', 'Convexity',
-                     'Particle_Count']
-
-    # Create a DataFrame for test data with feature names
-    X_test_df = pd.DataFrame(X_test, columns=feature_names)
-
-    # Scale test data using the same MinMaxScaler
-    X_test_scaled = min_max_scaler.transform(X_test_df)
-
-    # Make predictions
-    y_pred = model.predict(X_test_scaled)
-
-    # Determine the target string based on the predicted index
-    target_strings = {
-        0: 'Healthy',
-        1: 'Slightly Death',
-        2: 'Extremely Death'
-    }
-    index = y_pred.argmax()
-    return target_strings[index]
-
-
+# Print the evaluation metrics for Random Forest
+print("Performance of Random Forest:")
+print(f"Cross-Validation Accuracy: {average_cv_score:.4f}")
+print(f"Test Accuracy: {accuracy_rf:.4f}")
+print(f"Precision: {precision_rf:.4f}")
+print(f"Recall: {recall_rf:.4f}")
+print(f"F1 Score: {f1_rf:.4f}")

@@ -67,7 +67,7 @@ def import_images(project_name, cell_name,  image_paths, scaleValues):
              particle_count]]
         viability = predict_target(X)
         
-        ops.create_cell_phase(id, phase_number , area_mm2, perimeter_mm, diameter_mm, roundness,aspect_ratio, solidity, convexity, particle_count, scaleValue, viability)
+        ops.create_cell_phase(id, phase_number, area_mm2, perimeter_mm, diameter_mm, roundness,aspect_ratio, solidity, convexity, particle_count, scaleValue, viability)
         conn.commit()
     
 @eel.expose
