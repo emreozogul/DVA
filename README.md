@@ -27,5 +27,6 @@ pip install -r requirements.txt
 
 Special thanks to our supervisors, Assoc. Prof. Dr. Kaya Oğuz and Prof. Dr. Zeynep Fırtına Karagonlar.
 
+The project has earned the right to receive support from The Scientific and Technological Research Council of Turkey (TÜBİTAK).
 
 Project Link: [https://github.com/emreozogul/DVA](https://github.com/emreozogul/DVA)
