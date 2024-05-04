@@ -106,15 +106,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       alert('Failed to export data');
     }
   });
-  document.getElementById('backBtn').addEventListener('click', function() {
-    loadProjectPage();
-  });
-  async function loadProjectPage(){
-    document.getElementById('projectPage1').style.display = 'flex';
-    document.getElementById('projectPage2').style.display = 'none';
-    document.getElementById('projectPageOverview').style.display = 'none';
-  }
-
 
   var modal = document.getElementById("myModal");
   var btn = document.getElementById("HelpNav");
