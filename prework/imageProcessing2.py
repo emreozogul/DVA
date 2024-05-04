@@ -103,5 +103,4 @@ def count_particles_4x(image, min_area=50, max_area=4500, circularity_thresh=0.3
 
             if circularity >= circularity_thresh:
                 particle_count += 1
-
     return particle_count

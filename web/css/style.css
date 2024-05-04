@@ -32,14 +32,14 @@ img {
     display: flex;
     flex-direction: column;
     height: 100vh;
-} 
+}
 
 h1 {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
     margin-top: 2rem;
     text-align: center;
-    
+
 }
 
 .explanation {
@@ -56,8 +56,10 @@ h1 {
     right: 0;
     margin: 0;
     padding: 0.5rem;
-    transition: margin-left 0.5s; /* Added transition property */
-    margin-left: 0; /* Initial margin-left value */
+    transition: margin-left 0.5s;
+    /* Added transition property */
+    margin-left: 0;
+    /* Initial margin-left value */
 }
 
 
@@ -74,7 +76,7 @@ h1 {
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
         -5px -5px 10px rgba(255, 255, 255, 0.5);
     max-width: 600px;
-    
+
 }
 
 a {
@@ -126,6 +128,7 @@ a:hover {
         font-weight: bold;
     }
 }
+
 .page {
     display: flex;
     flex: 1;
@@ -305,8 +308,7 @@ a:hover {
     background-color: #111;
     color: white;
     border: none;
-    border-radius: 4px;
-
+    border-radius: 6px;
 }
 
 .button:hover {
@@ -322,7 +324,7 @@ a:hover {
 .normal {
     font-size: 20px;
     height: 40px;
-    padding: 4px 8px;
+    padding: 6px 8px;
 
 }
 
@@ -477,6 +479,35 @@ a:hover {
     padding: 6px;
 }
 
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    margin: 20px 0;
+
+}
+
+thead {
+    background-color: rgb(58, 57, 57);
+    color: white;
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    height: 50px;
+}
+
+tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+
 
 /* import page */
 
@@ -486,7 +517,6 @@ a:hover {
     gap: 20px;
     background-color: #574f4f0f;
     border: 1px solid #ccc;
-
     padding: 20px;
     border-radius: 4px;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),

@@ -114,3 +114,60 @@ class DatabaseOperations:
                 })
             project_cells.append(cell_phases)
         return project_cells
+       
+    def get_last_phase_data(self, cell_id):
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM cellPhases WHERE cell_id = ? ORDER BY phase_id DESC LIMIT 1", (cell_id,))
+        return cursor.fetchone()
+    
+    def get_cells_by_project_name(self, project_name):
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM cells WHERE projectName = ?", (project_name,))
+        cells = cursor.fetchall()
+        
+        cell_data = []
+        for cell in cells:
+            print(cell)
+            data = self.get_last_phase_data(cell[0])
+            print(data)
+            newRow = {"cellName": cell[3],"area": data[3], "perimeter": data[4] , "roundness": data[6] ,"particleCount": data[10] , "viability": data[12]}
+            cell_data.append(newRow)
+        return cell_data
+    
+    def getDataOfProject(self, project_name):
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        query = f"""
+        SELECT 
+            p.id AS project_id, 
+            p.name AS project_name,
+            c.cell_id,
+            c.name AS cell_name, 
+            cp.phase_id,
+            cp.phaseNumber,
+            cp.area_mm2,
+            cp.perimeter_mm,
+            cp.diameter_mm,
+            cp.roundness,
+            cp.aspectRatio,
+            cp.solidity,
+            cp.convexity,
+            cp.particleCount,
+            cp.scaleValue,
+            cp.viability
+        FROM 
+            projects p
+        JOIN 
+            cells c ON p.id = c.project_id
+        JOIN 
+            cellPhases cp ON c.cell_id = cp.cell_id
+        WHERE 
+            p.name = ?
+        """
+        cursor.execute(query, (project_name,))
+        return cursor.fetchall()
+    
+        
+            
