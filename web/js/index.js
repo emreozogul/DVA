@@ -135,7 +135,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   var span = document.getElementsByClassName("close")[0];
   btn.onclick = function () {
     modal.style.display = "block";
-    var helpContent = "This is a help message.";
+    var helpContent = `<div style="display:flex; flex-direction:column; gap:8px; font-weight:bold; padding:6px;">
+    <p><strong>1. Import:</strong> Import cells into selected projects for viability analysis. Afterwards, you can add new cells to the model to achieve higher accuracy.</p>
+    <p><strong>2. Project:</strong> Each project contains different cells, and each project is tailored for different users.</p>
+    <p><strong>3. Crop:</strong> If you need to crop images, you must first upload them. You can then perform cropping, rotation, and zoom operations.</p>
+    <p><strong>4. Settings:</strong> If you are getting poor results from the model over time, you can reset the model to the base model.</p>
+</div>`;
     openModal('Help', helpContent, 'plain');
   }
   span.onclick = function () {

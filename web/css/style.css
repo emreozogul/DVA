@@ -837,6 +837,22 @@ tbody tr:hover {
     max-height: 600px;
 }
 
+.img-container-mock {
+    width: 100%;
+    margin-bottom: 20px;
+    max-height: 600px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
+        -5px -5px 10px rgba(255, 255, 255, 0.5);
+
+}
+
 .hidden {
     display: none;
 }

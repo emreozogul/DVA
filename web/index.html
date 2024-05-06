@@ -31,6 +31,9 @@
                             // set max width and height as 800px
                             
                             const imgContainer = document.querySelector('.img-container');
+                            const imgContainerMock = document.querySelector('.img-container-mock');
+                            imgContainer.style.display = "block";
+                            imgContainerMock.style.display = "none";
                             imgContainer.innerHTML = ""; // Clear the container
                             imgContainer.appendChild(canvas);
 
@@ -264,9 +267,9 @@
                         <th>Cell Name</th>
                         <th>Area<br><span style="font-size: small;">(last phase)</span></th>
                         <th>Perimeter<br><span style="font-size: small;">(last phase)</span></th>
-                        <th>Roundness</th>
-                        <th>Particle Count</th>
-                        <th>Viability</th>
+                        <th>Roundness<br><span style="font-size: small;">(last phase)</span></th>
+                        <th>Particle Count<br><span style="font-size: small;">(last phase)</span></th>
+                        <th>Viability<br><span style="font-size: small;">(last phase)</span></th>
                     </tr>
                 </thead>
                 <tbody id="tableContent"></tbody>
@@ -301,7 +304,64 @@
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 3V14.8C6 15.9201 6 16.4802 6.21799 16.908C6.40973 17.2843 6.71569 17.5903 7.09202 17.782C7.51984 18 8.0799 18 9.2 18H15M21 18H18M18 21V9.2C18 8.0799 18 7.51984 17.782 7.09202C17.5903 6.71569 17.2843 6.40973 16.908 6.21799C16.4802 6 15.9201 6 14.8 6H9M3 6H6" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
             </button>
         </div>
-        <div class="img-container">
+        <div class="img-container-mock">
+            <h2>Import an image to start cropping</h2>
+        </div>
+        <div class="img-container" style="display: none;">
+        </div>
+    </div>
+    <div class="page" id="Settings" style="display: none;">
+        <div class="section" style="display: flex;" >
+            <div class="section-remaining">
+                <form class="form" id="settingsForm">
+                    <div style=" width: 100%;display: flex; align-items: center;justify-content: space-between;gap: 4px;margin-bottom: 20px;">
+                        <h2>Settings</h2>
+                        <button type="submit" class="button normal" id="submitBtnSettings" style="padding-right: 16px; padding-left:16px;" >
+                            <span>Submit</span>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <p>API Key</p>
+                        <input type="text" id="apiKey" />
+                    </div>
+                    <div class="row">
+                        <p>API URL</p>
+                        <input type="text" id="apiUrl" />
+                    </div>
+                </form>
+                <form class="form" id="settingsForm">
+                    <div style=" width: 100%;display: flex; align-items: center;justify-content: space-between;gap: 4px;margin-bottom: 20px;">
+                        <h2>Settings</h2>
+                        <button type="submit" class="button normal" id="submitBtnSettings" style="padding-right: 16px; padding-left:16px;" >
+                            <span>Submit</span>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <p>API Key</p>
+                        <input type="text" id="apiKey" />
+                    </div>
+                    <div class="row">
+                        <p>API URL</p>
+                        <input type="text" id="apiUrl" />
+                    </div>
+                </form>
+                <form class="form" id="settingsForm">
+                    <div style=" width: 100%;display: flex; align-items: center;justify-content: space-between;gap: 4px;margin-bottom: 20px;">
+                        <h2>Settings</h2>
+                        <button type="submit" class="button normal" id="submitBtnSettings" style="padding-right: 16px; padding-left:16px;" >
+                            <span>Submit</span>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <p>API Key</p>
+                        <input type="text" id="apiKey" />
+                    </div>
+                    <div class="row">
+                        <p>API URL</p>
+                        <input type="text" id="apiUrl" />
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
