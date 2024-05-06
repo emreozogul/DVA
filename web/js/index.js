@@ -45,8 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('closebtn').addEventListener('click', closeNav);
 
-  document.getElementById('prevBtnImport').addEventListener('click', prevPageImport);
-
   document.getElementById('sNewProjectBtn').addEventListener('click', showAddScreenProject);
 
   document.getElementById('sProjectListBtn').addEventListener('click', showProjectList);
@@ -54,7 +52,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.querySelector('.navContainer').addEventListener('click', function (event) {
     if (event.target.classList.contains('navItem')) {
       var sectionId = event.target.getAttribute('data-section');
-      console.log(sectionId);
       showSection(sectionId);
     }
   });
@@ -70,61 +67,116 @@ document.addEventListener('DOMContentLoaded', async () => {
     scaleSelects.forEach(function (select) {
       scaleValues.push(select.querySelector('.scale-select').value);
     });
+
     if (projectName === '' || projectName === undefined || projectName === null || projectName === "Select a project") {
-      alert('Select a project first.');
+      openModal('Import', 'Select a project first.', 'error');
       return;
-    }
-    else if (phaseQuantity === '' || phaseQuantity === undefined || phaseQuantity === null) {
-      alert('Select the number of phases first.');
+    } else if (phaseQuantity === '' || phaseQuantity === undefined || phaseQuantity === null) {
+      openModal('Import', 'Select the number of phases first.', 'error');
       return;
     } else if (!checkPhaseImagesAreUploaded()) {
-      alert('Please upload an image for each phase.');
+      openModal('Import', 'Upload images for each phase.', 'error');
       return;
     }
-    else {
+
+    try {
       var phaseContainer = document.getElementById('phaseUpload');
       var imagePaths = [];
       if (phaseContainer.hasChildNodes()) {
         var labels = phaseContainer.getElementsByClassName('label');
-
         for (var i = 0; i < labels.length; i++) {
           imagePaths.push(labels[i].textContent);
         }
       }
-      eel.import_images(projectName, cellName, imagePaths, scaleValues)();
-
+      var res = await eel.import_images(projectName, cellName, imagePaths, scaleValues)();
+      var resultPage = document.getElementById("importPageResult");
+      var importPage = document.getElementById("importPageInput");
+      resultPage.style.display = 'flex';
+      importPage.style.display = 'none';
+      showResults(res);
+    } catch (error) {
+      console.error('An error occurred:', error);
+      openModal('Import', 'Failed to import images. Please try again.', 'error');
     }
+  });
 
+
+  document.getElementById('backOverviewButton').addEventListener('click', function () {
+    document.getElementById('projectPage1').style.display = 'none';
+    document.getElementById('projectPage2').style.display = 'none';
+    document.getElementById('projectPageOverview').style.display = 'none';
+    showProjectList();
   });
 
   document.getElementById("exportBtn").addEventListener('click', async function () {
     let res = await eel.export_data(activeProject)();
     if (res) {
-      alert('Data exported successfully');
-    }
-    else {
-      alert('Failed to export data');
+      openModal('Export', 'Data exported successfully.', 'success');
+    } else {
+      openModal('Export', 'Failed to export data.', 'error');
     }
   });
+
+  document.getElementById("importToProject").addEventListener('click', function () {
+    document.getElementById('Import').style.display = 'none';
+    document.getElementById('Project').style.display = 'flex';
+    showProjectList();
+
+  });
+
+  document.getElementById("resultToImport").addEventListener('click', function () {
+    document.getElementById('importPageResult').style.display = 'none';
+    document.getElementById('importPageInput').style.display = 'flex';
+
+  });
+
+
+
+  function clearOverviewTable() {
+    // Clear previous project data
+    var tableBody = document.getElementById("overviewTableBody");
+    tableBody.innerHTML = "";
+  }
+
+  function displayProjectData(projectData) {
+    var tableBody = document.getElementById("overviewTableBody");
+    projectData.forEach(function (project) {
+      var row = document.createElement("tr");
+      var nameCell = document.createElement("td");
+      nameCell.textContent = project.name;
+      var ownerCell = document.createElement("td");
+      ownerCell.textContent = project.owner;
+      var descriptionCell = document.createElement("td");
+      descriptionCell.textContent = project.description;
+      row.appendChild(nameCell);
+      row.appendChild(ownerCell);
+      row.appendChild(descriptionCell);
+      tableBody.appendChild(row);
+    });
+  }
+
+
+
 
   var modal = document.getElementById("myModal");
   var btn = document.getElementById("HelpNav");
   var span = document.getElementsByClassName("close")[0];
   btn.onclick = function () {
     modal.style.display = "block";
+    var helpContent = "This is a help message.";
+    openModal('Help', helpContent, 'plain');
   }
   span.onclick = function () {
     modal.style.display = "none";
+    clearModal();
   }
   window.onclick = function (event) {
     if (event.target == modal) {
       modal.style.display = "none";
+      clearModal();
     }
   }
 
-  function openModal(message) {
-
-  }
 
   function updatePhaseUpload(phaseQuantity) {
     const phaseUploadDiv = document.getElementById('phaseUpload');
@@ -272,7 +324,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let response = await checkProjectExists(projectName);
     if (response) {
-      alert('Project already exists.');
+      openModal('Add Project', 'Project already exists.', 'error');
       return;
     }
     var newProject = {
@@ -292,15 +344,61 @@ document.addEventListener('DOMContentLoaded', async () => {
     showProjectList();
   });
 
+  function showResults(res) {
+    try {
+      var container = document.getElementById("import-result-container");
+      container.innerHTML = ''; // Clear previous results
+      if (Array.isArray(res)) {
+        res.forEach((phase, index) => {
+          const card = document.createElement("div");
+          card.className = "import-result-card";
+
+          function formatNumber(value) {
+            return value !== undefined && value !== null ? value.toFixed(2) : 'N/A';
+          }
+          const cardHTML = `
+                    <div class="header">
+                        <h2>Results of Phase ${phase.phaseNo}</h1>
+                        <p>${phase.viability !== undefined ? phase.viability : 'Unknown Viability'}</h2>
+                    </div>
+                    <div class="footer">
+                      <div class = "result-actions">
+                        <button id="viewResults-${index}" class="result-action">View Results</button>
+                        <button id="addToModel-${index}" class="result-action">Add to the Model</button>
+                      </div>
+                    </div>
+                `;
+          card.innerHTML = cardHTML;
+          container.appendChild(card);
+          var roundness = phase.roundness * 100;
+          document.getElementById(`viewResults-${index}`).addEventListener('click', () => {
+            const viewResultContent = `
+                        <div style="display:flex; flex-direction:column; gap:6px; font-weight:bold;">
+                            <p><strong>Area:</strong> ${formatNumber(phase.area)} mm²</p>
+                            <p><strong>Perimeter:</strong> ${formatNumber(phase.perimeter)} mm</p>
+                            <p><strong>Diameter:</strong> ${formatNumber(phase.diameter)} mm</p>
+                            <p><strong>Roundness:</strong> ${formatNumber(roundness)}</p>
+                            <p><strong>Aspect Ratio:</strong> ${formatNumber(phase.aspectRatio)}</p>
+                            <p><strong>Solidity:</strong> ${formatNumber(phase.solidity)}</p>
+                            <p><strong>Convexity:</strong> ${formatNumber(phase.convexity)}</p>
+                            <p><strong>Particles:</strong> ${phase.particles !== undefined ? phase.particles : 'N/A'}</p>
+                            <p><strong>Scale:</strong> ${phase.scale !== undefined ? phase.scale : 'N/A'}</p>
+                        </div>`;
+            openModal('View Results', viewResultContent, 'plain');
+          });
+          document.getElementById(`addToModel-${index}`).addEventListener('click', () => {
+            openModal('Add to the Model', '', 'plain');
+          });
+        });
+      } else {
+        console.error('Expected an array for response, received:', res);
+      }
+    } catch (error) {
+      console.error('Failed to fetch result data:', error);
+    }
+  }
 });
 
-// project
-
-async function deleteProject(projectName) {
-  await eel.delete_project(projectName)();
-  projects = projects.filter(project => project.name !== projectName);
-  updateProjectList();
-}
 
 function updateProjectList() {
   var projectList = document.getElementById('projects');
@@ -333,11 +431,13 @@ function updateProjectList() {
 }
 
 function showProjectList() {
+  document.getElementById('projectPageOverview').style.display = 'none';
   document.getElementById('projectPage1').style.display = 'flex';
   document.getElementById('projectPage2').style.display = 'none';
 }
 
 function showAddScreenProject() {
+  document.getElementById('projectPageOverview').style.display = 'none';
   document.getElementById('projectPage1').style.display = 'none';
   document.getElementById('projectPage2').style.display = 'flex';
 }
@@ -347,12 +447,12 @@ function checkPhaseImagesAreUploaded() { //
   if (phaseContainer.hasChildNodes()) {
     var labels = phaseContainer.getElementsByClassName('label');
     if (labels.length === 0) {
-      alert('Select the number of phases first.');
+      openModal('Import', 'Upload images for each phase.', 'error');
       return false;
     }
     for (var i = 0; i < labels.length; i++) {
       if (labels[i].textContent === '') {
-        alert('Please upload an image for phase ' + (i + 1));
+        openModal('Import', ('Please upload an image for phase ' + (i + 1)), 'error');
         return false;
       }
     }
@@ -384,35 +484,104 @@ function checkProjectExists(projectName) {
 
 async function overviewProject(projectName) {
   try {
-    const projectData = await eel.get_project_data(projectName)();  // Properly await the asynchronous Eel call
     activeProject = projectName;
-    const tableContent = document.getElementById('tableContent');
-    tableContent.innerHTML = '';
-    document.getElementById('projectPage1').style.display = 'none';
-    document.getElementById('projectPage2').style.display = 'none';
-    document.getElementById('projectPageOverview').style.display = 'flex';
+    const pageSize = 12;
+    const totalCount = await eel.get_total_cells_count(projectName)();
+    const maxPages = Math.ceil(totalCount / pageSize);
 
-    if (Array.isArray(projectData)) {  // Check if projectData is indeed an array
-      projectData.map(data => {
-        const row = document.createElement('tr');
-        let dataRoundessOverHundreds = data.roundness * 100;
-        dataRoundessOverHundreds = dataRoundessOverHundreds.toFixed(2);
-        let dataArea = data.area.toFixed(2);
-        let dataPerimeter = data.perimeter.toFixed(2);
-        row.innerHTML = `
-          <td>${data.cellName}</td>
-          <td>${dataArea}</td>
-          <td>${dataPerimeter}</td>
-          <td>${dataRoundessOverHundreds}%</td>
-          <td>${data.particleCount}</td>
-          <td>${data.viability}</td>
-        `;
-        tableContent.appendChild(row);
-      });
-    } else {
-      console.error('Expected an array for project data, received:', projectData);
-    }
+    var currentPage = 1;
+    var projectData = await eel.paginate_project_data(projectName, currentPage, pageSize)();
+
+    const tableContent = document.getElementById('tableContent');
+    const buttonContainer = document.getElementById('overviewProjectButtons');
+
+    setupUI(projectName, tableContent, buttonContainer, projectData, currentPage, maxPages, pageSize);
+
   } catch (error) {
     console.error('Failed to fetch project data:', error);
   }
+}
+
+function setupUI(projectName, tableContent, buttonContainer, projectData, currentPage, maxPages, pageSize) {
+  document.getElementById('projectPage1').style.display = 'none';
+  document.getElementById('projectPage2').style.display = 'none';
+  document.getElementById('projectPageOverview').style.display = 'flex';
+
+  fillTable(tableContent, projectData);
+
+  buttonContainer.innerHTML = `
+      <div class="button small" id="paginateBackward"><svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8 5L3 10L8 15" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M3 10H11C16.5228 10 21 14.4772 21 20V21" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></div>
+      <div class="button small" id="paginateForward"> <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M16 5L21 10L16 15" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M21 10H13C7.47715 10 3 14.4772 3 20V21" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></div>
+    `;
+
+  document.getElementById("paginateForward").addEventListener('click', async () => {
+    if (currentPage < maxPages) {
+      currentPage++;
+      projectData = await eel.paginate_project_data(projectName, currentPage, pageSize)();
+      fillTable(tableContent, projectData);
+    } else {
+      openModal('Pagination', 'No more data to display.', 'error');
+    }
+  });
+
+  document.getElementById("paginateBackward").addEventListener('click', async () => {
+    if (currentPage > 1) {
+      currentPage--;
+      projectData = await eel.paginate_project_data(projectName, currentPage, pageSize)();
+      fillTable(tableContent, projectData);
+    } else {
+      openModal('Pagination', 'No more data to display.', 'error');
+    }
+  });
+}
+
+function fillTable(tableContent, projectData) {
+  tableContent.innerHTML = '';
+  if (Array.isArray(projectData)) {
+    projectData.forEach(data => {
+      const row = document.createElement('tr');
+      let dataRoundnessOverHundreds = data.roundness * 100;
+      row.innerHTML = `
+        <td>${data.cellName}</td>
+        <td>${parseFloat(data.area).toFixed(2)}</td>
+        <td>${parseFloat(data.perimeter).toFixed(2)}</td>
+        <td>${parseFloat(dataRoundnessOverHundreds).toFixed(2)}%</td>
+        <td>${data.particleCount}</td>
+        <td>${data.viability}</td>
+      `;
+      tableContent.appendChild(row);
+    });
+  } else {
+    console.error('Expected an array for project data, received:', projectData);
+  }
+}
+
+
+function openModal(title, content, type) {
+  var modal = document.getElementById("myModal");
+  var modalTitle = document.getElementById("modalTitle");
+  var modalContent = document.getElementById("modalContent");
+
+  modalTitle.textContent = title;
+  modalContent.innerHTML = content;
+
+  if (type === 'success') {
+    modalBody.style.color = 'green';
+  }
+  else if (type === 'error') {
+    modalBody.style.color = 'red';
+  } else if (type === 'plain') {
+    modalBody.style.color = 'black';
+  }
+
+  modal.style.display = "block";
+}
+
+function clearModal() {
+  var modal = document.getElementById("myModal");
+  var modalTitle = document.getElementById("modalTitle");
+  var modalContent = document.getElementById("modalContent");
+
+  modalTitle.textContent = '';
+  modalContent.textContent = '';
 }

@@ -129,9 +129,7 @@ class DatabaseOperations:
         
         cell_data = []
         for cell in cells:
-            print(cell)
             data = self.get_last_phase_data(cell[0])
-            print(data)
             newRow = {"cellName": cell[3],"area": data[3], "perimeter": data[4] , "roundness": data[6] ,"particleCount": data[10] , "viability": data[12]}
             cell_data.append(newRow)
         return cell_data
@@ -169,5 +167,52 @@ class DatabaseOperations:
         cursor.execute(query, (project_name,))
         return cursor.fetchall()
     
-        
-            
+    def count_cells_by_project_name(self, project_name):
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        query = "SELECT COUNT(*) FROM cells WHERE projectName = ?"
+        cursor.execute(query, (project_name,))
+        count = cursor.fetchone()[0]
+        return count
+
+    def paginate_cells_by_project_name(self, project_name, page_number, page_size):
+        conn = self.db.get_connection()
+        cursor = conn.cursor()
+        offset = (page_number - 1) * page_size
+        query = """
+        SELECT 
+            cells.cell_id, 
+            cells.name AS cell_name, 
+            cellPhases.area_mm2, 
+            cellPhases.perimeter_mm, 
+            cellPhases.roundness, 
+            cellPhases.particleCount, 
+            cellPhases.viability 
+        FROM 
+            cells 
+        JOIN 
+            cellPhases ON cells.cell_id = cellPhases.cell_id 
+        WHERE 
+            cells.projectName = ?
+        LIMIT ? OFFSET ?
+        """
+
+        cursor.execute(query, (project_name, page_size, offset))
+        cells = cursor.fetchall()
+
+        cell_data = []
+        for cell in cells:
+            newRow = {
+                "cellName": cell[1],
+                "area": cell[2],
+                "perimeter": cell[3],
+                "roundness": cell[4],
+                "particleCount": cell[5],
+                "viability": cell[6]
+            }
+            cell_data.append(newRow)
+
+        return cell_data
+
+
+                

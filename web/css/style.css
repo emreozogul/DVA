@@ -57,9 +57,7 @@ h1 {
     margin: 0;
     padding: 0.5rem;
     transition: margin-left 0.5s;
-    /* Added transition property */
     margin-left: 0;
-    /* Initial margin-left value */
 }
 
 
@@ -68,14 +66,15 @@ h1 {
     margin-bottom: 0.5rem;
     margin-left: auto;
     margin-right: auto;
-    padding: 0.5rem;
+    padding: 1rem;
     display: block;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #f9f9f9;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
         -5px -5px 10px rgba(255, 255, 255, 0.5);
-    max-width: 600px;
+    max-width: 650px;
+    font-size: large;
 
 }
 
@@ -347,6 +346,7 @@ a:hover {
     justify-content: center;
     flex-direction: column;
     gap: 20px;
+    width: 100%;
 }
 
 .import-custom-select {
@@ -391,6 +391,73 @@ a:hover {
     top: 55%;
 }
 
+#import-result-container {
+    display: flex;
+    gap: 20px;
+    width: 80%;
+    flex: 1;
+    max-width: 80%;
+    justify-content: center;
+    flex-wrap: wrap;
+
+}
+
+.import-result-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: #574f4f0f;
+    border: 1px solid #ccc;
+    padding: 20px;
+    width: 80%;
+    border-radius: 4px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
+        -5px -5px 10px rgba(255, 255, 255, 0.5);
+}
+
+
+.import-result-card .header {
+    display: flex;
+    width: 100%;
+    flex: 1;
+    flex-direction: column;
+}
+
+.import-result-card .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    width: 100%;
+}
+
+.import-result-card .content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.import-result-card .footer .result-actions {
+    display: flex;
+    gap: 10px;
+
+}
+
+.import-result-card .footer .result-actions .result-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #111;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px;
+}
+
+.import-result-card .footer .result-actions .result-action:hover {
+    background-color: #444;
+}
 
 
 /* project page */
@@ -684,12 +751,27 @@ tbody tr:hover {
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
-    border-radius: 4px;
-    width: 80%;
+    border-radius: 12px;
+    width: 60%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     animation-name: animatetop;
     animation-duration: 0.4s;
 }
+
+#modalTitle {
+    font-size: 1.25rem;
+    font-weight: bolder;
+    margin-bottom: 0.5rem;
+    margin-top: 2rem;
+    text-align: center;
+}
+
+#modalContent {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 
 /* Add Animation */
 @keyframes animatetop {

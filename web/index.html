@@ -111,6 +111,7 @@
             <div id="ImageNav"  class="navItem" data-section="Import" >Import</div>
             <div id="ProjectNav"  class="navItem" data-section="Project" >Project</div>
             <div id="CropNav"  class="navItem" data-section="Crop" >Crop</div>
+            <div id="SettingsNav"  class="navItem" data-section="Settings" >Settings</div>
 
         </div>
         <div style="display: flex; align-items:center ; justify-content: center;"> 
@@ -130,14 +131,14 @@
         <h1>Welcome to Dynamic Viability Analysis</h1>
         <p class="explanation">Quickly analyze the viability of cancer cells.</p>
         <ol class="steps-list">
-            <li><strong>Import:</strong> Upload your cell images to start the analysis.</li>
+            <li><strong><span class="color:red;">Import:</span></strong> Upload your cell images to start the analysis.</li>
             <li><strong>Project:</strong> Organize your images and data within projects.</li>
             <li><strong>Analysis:</strong> Utilize our cropping tools and get real-time viability results.</li>
         </ol>
-        <p class="help">Need help? Visit our <a href="#HelpNav">Help Section</a> or <a href="mailto:support@example.com">contact support</a>.</p>
+        <p class="help">Need help? Visit our <a href="#HelpNav">Help Section</a> or <a href="mailto:admin@vicatech.com">contact support</a>.</p>
     </div>
     <div class="page" id="Import" style="display: none;">
-        <div id="importPageInput" class="section" >
+        <div id="importPageInput" class="section" style="display: flex;" >
             <div class="section-remaining">
                 <form class="form" id="importForm">
                     <div style=" width: 100%;display: flex; align-items: center;justify-content: space-between;gap: 4px;margin-bottom: 20px;">
@@ -152,8 +153,8 @@
                             <select class="project-select-import" id="project-select">
                                 <option value="">Select project</option>
                             </select>
-                            <div class="button small" style="border-radius: 100%;" >
-                                <svg width="20px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <div class="button small" style="border-radius: 100%;" id="importToProject" >
+                                <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                                     <g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
@@ -190,14 +191,14 @@
             <div class="buttonContainer">
                 <div  style="flex: 1 ; width:100%"></div>
                 <div  style="display: flex ; flex-direction:row; gap: 4px;">
-                    <div class="button small" id="prevBtnImport">
+                    <div class="button small" id="resultToImport">
                         <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8 5L3 10L8 15" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M3 10H11C16.5228 10 21 14.4772 21 20V21" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>                        
                     </div>
                 </div>
             </div>
-            
-
-
+            <div class="section-remaining">
+                <div id="import-result-container"></div>
+            </div>
         </div>
     </div>
     <div class="page" id="Project" style="display: none;">
@@ -248,6 +249,9 @@
             <div class="buttonContainer">
                 <div  style="flex: 1 ; width:100%"></div>
                 <div  style="display: flex ; flex-direction:row; gap: 4px;">
+                    <div class="button normal" id="backOverviewButton">
+                        <span>Back</span>
+                    </div>
                     <div class="button normal" id="exportBtn" style="display: flex; gap: 6px; align-items:center; padding:12px ">
                         <span class="font-size:small;">Export</span>
                         <svg fill="#ffffff" width="24px" height="24px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="m0 1016.081 409.186 409.073 79.85-79.736-272.867-272.979h1136.415V959.611H216.169l272.866-272.866-79.85-79.85L0 1016.082ZM1465.592 305.32l315.445 315.445h-315.445V305.32Zm402.184 242.372-329.224-329.11C1507.042 187.07 1463.334 169 1418.835 169h-743.83v677.647h112.94V281.941h564.706v451.765h451.765v903.53H787.946V1185.47H675.003v564.705h1242.353V667.522c0-44.498-18.07-88.207-49.581-119.83Z" fill-rule="evenodd"></path> </g></svg>
@@ -269,15 +273,7 @@
             </table>
             <div class="buttonContainer">
                 <div  style="flex: 1 ; width:100%"></div>
-                <div style="display:flex; align-items:center; flex-direction:row; gap: 4px;">
-                    <div class="button small" id="prevBtnProject">
-                        <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8 5L3 10L8 15" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M3 10H11C16.5228 10 21 14.4772 21 20V21" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>                        
-                    </div>
-                    <div class="button small" id="nextBtnProject">
-                        <svg width="16px" height="16px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M16 5L21 10L16 15" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M21 10H13C7.47715 10 3 14.4772 3 20V21" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>                        
-                    </div>
-                </div>
-
+                <div style="display:flex; align-items:center; flex-direction:row; gap: 4px;" id="overviewProjectButtons"></div>
             </div>
         </div>
     </div>
@@ -311,11 +307,12 @@
 
     <div id="myModal" class="modal">
         <div class="modal-content">
-            <div class="row" style="display: flex; flex:1; justify-content:end; width:100%; align-items:center">
+            <div class="row" style="display: flex; flex:1; justify-content:space-between; width:100%; align-items:center">
+                <div id="modalTitle"></div>
                 <span class="close">&times;</span>
             </div>
           <div class="modal-content-body" id="modalBody">
-
+            <div id="modalContent"></div>
           </div>
         </div>
       

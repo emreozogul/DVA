@@ -52,7 +52,15 @@ def check_project_exists(project_name):
 def get_project_data(project_name):
     cellsData = ops.get_cells_by_project_name(project_name)
     return cellsData
-    
+
+@eel.expose
+def paginate_project_data(project_name, page_number, page_size):
+    cellsData = ops.paginate_cells_by_project_name(project_name, page_number, page_size)
+    return cellsData
+
+@eel.expose
+def get_total_cells_count(project_name):
+    return ops.count_cells_by_project_name(project_name)
 
 @eel.expose
 def import_images(project_name, cell_name,  image_paths, scaleValues):
@@ -60,6 +68,7 @@ def import_images(project_name, cell_name,  image_paths, scaleValues):
     ops.create_cell(project_name, cell_name,length)
     conn.commit()
     id = ops.get_last_cell_id()
+    cell_results = []
     for i in range(length):
         image_path = image_paths[i]
         scaleValue = scaleValues[i]
@@ -76,6 +85,11 @@ def import_images(project_name, cell_name,  image_paths, scaleValues):
         
         ops.create_cell_phase(id, phase_number, area_mm2, perimeter_mm, diameter_mm, roundness,aspect_ratio, solidity, convexity, particle_count, scaleValue, viability)
         conn.commit()
+        
+        cell_results.append({"phaseNo":phase_number, "area": area_mm2, "perimeter": perimeter_mm, "diameter": diameter_mm, "roundness": roundness,"aspectRatio": aspect_ratio,"solidity": solidity,"convexity": convexity, "particles" :particle_count,"scale": scaleValue,"viability": viability})
+    
+    return cell_results
+    
     
 @eel.expose
 def get_cells_by_project_name(project_name):
@@ -84,11 +98,23 @@ def get_cells_by_project_name(project_name):
 
 @eel.expose
 def export_data(project_name):
-    data = ops.getDataOfProject(project_name)
-    column_names = ["project_id", "project_name", "cell_id", "cell_name", "phase_id", "phaseNumber", "area_mm2", "perimeter_mm", "diameter_mm", "roundness", "aspectRatio", "solidity", "convexity", "particleCount", "scaleValue", "viability"]
-    df = pd.DataFrame(data, columns=column_names)
-    df.to_csv(f"{project_name}.csv", index=False)
-    return "Success"
+    app = wx.App(False)
+    dlg = wx.DirDialog(None, "Choose a directory:", style=wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST)
+    
+    if dlg.ShowModal() == wx.ID_OK:
+        path = dlg.GetPath() 
+        data = ops.getDataOfProject(project_name)
+        print(data)
+        column_names = ["project_id", "project_name", "cell_id", "cell_name", "phase_id", "phaseNumber", "area_mm2", "perimeter_mm", "diameter_mm", "roundness", "aspectRatio", "solidity", "convexity", "particleCount", "scaleValue", "viability"]
+        df = pd.DataFrame(data, columns=column_names)
+        df.to_csv(f"{path}/{project_name}.csv", index=False)
+        result = "Success: File saved successfully."
+    else:
+        result = "Error: No directory selected."
+    
+    dlg.Destroy() 
+    return result
+
 if __name__ == '__main__':
     eel.init('web')  
     eel.init('web', allowed_extensions=['.js', '.html', '.css'])
