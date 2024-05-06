@@ -3,7 +3,7 @@ from database.operations import DatabaseOperations
 import eel
 import wx
 import pandas as pd
-from prework.imageProcessing2 import process_image_4x, process_image_10x
+from prework.imageProcessing import process_image_4x, process_image_10x
 from prework.model import predict_target
 
 db = DatabaseSingleton()
@@ -104,7 +104,6 @@ def export_data(project_name):
     if dlg.ShowModal() == wx.ID_OK:
         path = dlg.GetPath() 
         data = ops.getDataOfProject(project_name)
-        print(data)
         column_names = ["project_id", "project_name", "cell_id", "cell_name", "phase_id", "phaseNumber", "area_mm2", "perimeter_mm", "diameter_mm", "roundness", "aspectRatio", "solidity", "convexity", "particleCount", "scaleValue", "viability"]
         df = pd.DataFrame(data, columns=column_names)
         df.to_csv(f"{path}/{project_name}.csv", index=False)
