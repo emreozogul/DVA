@@ -1,11 +1,11 @@
 from database.db import DatabaseSingleton
 from database.operations import DatabaseOperations
 import eel
+import os
 import wx
 import pandas as pd
 from prework.imageProcessing import process_image_4x, process_image_10x
-from prework.model import predict_target
-
+from prework.model import predict_target , get_latest_csv_file
 db = DatabaseSingleton()
 conn = db.get_connection()
 c = conn.cursor()
@@ -86,11 +86,30 @@ def import_images(project_name, cell_name,  image_paths, scaleValues):
         ops.create_cell_phase(id, phase_number, area_mm2, perimeter_mm, diameter_mm, roundness,aspect_ratio, solidity, convexity, particle_count, scaleValue, viability)
         conn.commit()
         
-        cell_results.append({"phaseNo":phase_number, "area": area_mm2, "perimeter": perimeter_mm, "diameter": diameter_mm, "roundness": roundness,"aspectRatio": aspect_ratio,"solidity": solidity,"convexity": convexity, "particles" :particle_count,"scale": scaleValue,"viability": viability})
+        cell_results.append({"cellName": cell_name, "phaseNo":phase_number, "area": area_mm2, "perimeter": perimeter_mm, "diameter": diameter_mm, "roundness": roundness,"aspectRatio": aspect_ratio,"solidity": solidity,"convexity": convexity, "particles" :particle_count,"scale": scaleValue,"viability": viability})
     
     return cell_results
+
+@eel.expose
+def add_to_model_data(phase_data):
+    latest_csv_file = get_latest_csv_file()
+
+    full_csv_path = os.path.join(latest_csv_file) if latest_csv_file else None
+
+    if full_csv_path and os.path.exists(full_csv_path):
+        data = pd.read_csv(full_csv_path)
+    else:
+        data = pd.DataFrame()
+        
+    if not isinstance(phase_data, pd.DataFrame):
+        phase_data = pd.DataFrame([phase_data])
+
+    data = pd.concat([data, phase_data], ignore_index=True)
     
+    data.to_csv(full_csv_path, index=False)
     
+    return "Data added to model successfully."
+
 @eel.expose
 def get_cells_by_project_name(project_name):
     cells = ops.get_cells_by_project_name(project_name)

@@ -130,34 +130,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   });
 
-
-
-  function clearOverviewTable() {
-    // Clear previous project data
-    var tableBody = document.getElementById("overviewTableBody");
-    tableBody.innerHTML = "";
-  }
-
-  function displayProjectData(projectData) {
-    var tableBody = document.getElementById("overviewTableBody");
-    projectData.forEach(function (project) {
-      var row = document.createElement("tr");
-      var nameCell = document.createElement("td");
-      nameCell.textContent = project.name;
-      var ownerCell = document.createElement("td");
-      ownerCell.textContent = project.owner;
-      var descriptionCell = document.createElement("td");
-      descriptionCell.textContent = project.description;
-      row.appendChild(nameCell);
-      row.appendChild(ownerCell);
-      row.appendChild(descriptionCell);
-      tableBody.appendChild(row);
-    });
-  }
-
-
-
-
   var modal = document.getElementById("myModal");
   var btn = document.getElementById("HelpNav");
   var span = document.getElementsByClassName("close")[0];
@@ -386,9 +358,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>`;
             openModal('View Results', viewResultContent, 'plain');
           });
-          document.getElementById(`addToModel-${index}`).addEventListener('click', () => {
-            openModal('Add to the Model', '', 'plain');
+          document.getElementById(`addToModel-${index}`).addEventListener('click', function firstClickHandler(event) {
+            var button = event.target;
+
+            eel.add_to_model_data(phase)((response) => {
+              openModal('Add to the Model', response, 'success');
+              button.textContent = 'Added';
+              button.style.backgroundColor = 'green';
+              button.removeEventListener('click', firstClickHandler);
+              button.addEventListener('click', function subsequentClickHandler() {
+                openModal('Error', 'You cannot add anymore', 'error');
+              });
+            });
           });
+
         });
       } else {
         console.error('Expected an array for response, received:', res);

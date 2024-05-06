@@ -6,20 +6,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 def predict_target(X_test):
-    # Define feature names
     feature_names = ['Area_mm2', 'Perimeter_mm', 'Diameter_mm', 'Roundness', 'Aspect_Ratio', 'Solidity', 'Convexity',
                      'Particle_Count']
-
-    # Create a DataFrame for test data with feature names
+    
     X_test_df = pd.DataFrame(X_test, columns=feature_names)
-
-    # Scale test data using the same MinMaxScaler
     X_test_scaled = min_max_scaler.transform(X_test_df)
-
-    # Make predictions
     y_pred = best_rf_model.predict(X_test_scaled)
-
-    # Determine the target string based on the predicted index
     target_strings = {
         0: 'Healthy',
         1: 'Slightly Death',
@@ -28,20 +20,15 @@ def predict_target(X_test):
     index = y_pred.argmax()
     return target_strings[index]
 
-# Takes the folder path as input and returns the path to the latest CSV file in that folder.
 def get_latest_csv_file():
-    # Get a list of all files in the folder
     files = os.listdir(os.path.join(os.getcwd(), 'prework', 'data'))
     print(files)
-
-    # Filter out only CSV files
+    
     csv_files = [file for file in files if file.endswith('.csv')]
 
-    # Sort the CSV files based on their timestamps
     sorted_files = sorted(csv_files, key=lambda x: os.path.getmtime(os.path.join('prework', 'data', x)), reverse=True)
 
     if sorted_files:
-        # Return the path to the latest CSV file
         return os.path.join('prework', 'data', sorted_files[0])
     else:
         return None
