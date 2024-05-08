@@ -189,6 +189,47 @@ a:hover {
     color: #f1f1f1;
 }
 
+.sidebar .sidebarBottom {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+}
+
+.sidebarBottom div {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.navItem #resetIcon {
+    fill: #818181;
+    transition: fill 0.2s ease-in-out;
+}
+
+.navItem:hover #resetIcon {
+    fill: #ffffff;
+}
+
+.navItem #helpIcon {
+    stroke: #818181;
+    transition: stroke 0.2s ease-in-out;
+}
+
+.navItem:hover #helpIcon {
+    stroke: #ffffff;
+}
+
 
 .sidebar .closebtn {
     position: absolute;
@@ -544,6 +585,10 @@ a:hover {
     border: none;
     border-radius: 4px;
     padding: 6px;
+}
+
+.project-list li .footer .project-actions .project-action:hover {
+    background-color: #444;
 }
 
 table {

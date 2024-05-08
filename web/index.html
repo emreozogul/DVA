@@ -114,16 +114,18 @@
             <div id="ImageNav"  class="navItem" data-section="Import" >Import</div>
             <div id="ProjectNav"  class="navItem" data-section="Project" >Project</div>
             <div id="CropNav"  class="navItem" data-section="Crop" >Crop</div>
-            <div id="SettingsNav"  class="navItem" data-section="Settings" >Settings</div>
-
         </div>
-        <div style="display: flex; align-items:center ; justify-content: center;"> 
-            <div id="HelpNav">
+
+        <div id="sidebarBottom" style="display: flex; flex-direction:column; gap:6px; align-items:center ; justify-content: center;">
+            <div id="ResetNav" class="navItem">
+                <svg id="resetIcon" fill="currentColor" width="32px" height="32px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg" ><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M960 0v213.333c411.627 0 746.667 334.934 746.667 746.667S1371.627 1706.667 960 1706.667 213.333 1371.733 213.333 960c0-197.013 78.4-382.507 213.334-520.747v254.08H640V106.667H53.333V320h191.04C88.64 494.08 0 720.96 0 960c0 529.28 430.613 960 960 960s960-430.72 960-960S1489.387 0 960 0" fill-rule="evenodd"></path> </g></svg>
+            </div> 
+            <div id="HelpNav" class="navItem">
                 <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                     <g id="SVGRepo_iconCarrier"> 
-                        <path d="M12 17H12.01M12 14C12.8906 12.0938 15 12.2344 15 10C15 8.5 14 7 12 7C10.4521 7 9.50325 7.89844 9.15332 9M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                        <path id="helpIcon" d="M12 17H12.01M12 14C12.8906 12.0938 15 12.2344 15 10C15 8.5 14 7 12 7C10.4521 7 9.50325 7.89844 9.15332 9M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
                     </g>
                 </svg>   
             </div>
@@ -138,12 +140,12 @@
             <li><strong>Project:</strong> Organize your images and data within projects.</li>
             <li><strong>Analysis:</strong> Utilize our cropping tools and get real-time viability results.</li>
         </ol>
-        <p class="help">Need help? Visit our <a href="#HelpNav">Help Section</a> or <a href="mailto:admin@vicatech.com">contact support</a>.</p>
+        <p class="help">Need help? Visit our <a id="openHelpModal">Help Section</a> or <a href="mailto:admin@vicatech.com">contact support</a>.</p>
     </div>
     <div class="page" id="Import" style="display: none;">
         <div id="importPageInput" class="section" style="display: flex;" >
             <div class="section-remaining">
-                <form class="form" id="importForm">
+                <form class="form" id="importForm" style="font-weight:bold;">
                     <div style=" width: 100%;display: flex; align-items: center;justify-content: space-between;gap: 4px;margin-bottom: 20px;">
                         <h2>Import</h2>
                         <button type="submit" class="button normal" id="submitBtnImport" style="padding-right: 16px; padding-left:16px;" >
@@ -218,7 +220,7 @@
                 <ul class="project-list" id="projects"></ul>
             </div>
         </div>
-        <div id="projectPage2" class="section" style="display: none;">
+        <div id="projectPage2" class="section" style="display: none; align-items:center; justify-content:center;">
             <div class="buttonContainer">
                 <div  style="flex: 1 ; width:100%"></div>
                 <div  style="display: flex ; flex-direction:row; gap: 4px;">
@@ -227,7 +229,10 @@
                     </div>
                 </div>
             </div>
-            <form class="form" style="max-width: 600px;" id="addProjectForm"> 
+            <form class="form" style="max-width: 600px; font-weight:bold;" id="addProjectForm"> 
+                <div class="row">
+                    <h2>New Project</h2>
+                </div>
                 <div class="row">
                     <p> Owner</p>
                     <input type="text"  id="authorAdd"/>
@@ -241,9 +246,10 @@
                     <input type="text" id="descriptionAdd" />
                 </div>
                 <div class="buttonContainer" style="justify-content: end;">
-                <button type="submit" class="button normal" id="addProject" style="max-width: 200px;" >
-                    <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                <button type="submit" class="button normal" id="addProject" style="display:flex; align-items:center; gap:6px; " >
                     <span>Add Project</span>
+                    <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12H20M12 4V20" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+
                 </button>
                 </div>
             </form>
@@ -310,61 +316,6 @@
         <div class="img-container" style="display: none;">
         </div>
     </div>
-    <div class="page" id="Settings" style="display: none;">
-        <div class="section" style="display: flex;" >
-            <div class="section-remaining">
-                <form class="form" id="settingsForm">
-                    <div style=" width: 100%;display: flex; align-items: center;justify-content: space-between;gap: 4px;margin-bottom: 20px;">
-                        <h2>Settings</h2>
-                        <button type="submit" class="button normal" id="submitBtnSettings" style="padding-right: 16px; padding-left:16px;" >
-                            <span>Submit</span>
-                        </button>
-                    </div>
-                    <div class="row">
-                        <p>API Key</p>
-                        <input type="text" id="apiKey" />
-                    </div>
-                    <div class="row">
-                        <p>API URL</p>
-                        <input type="text" id="apiUrl" />
-                    </div>
-                </form>
-                <form class="form" id="settingsForm">
-                    <div style=" width: 100%;display: flex; align-items: center;justify-content: space-between;gap: 4px;margin-bottom: 20px;">
-                        <h2>Settings</h2>
-                        <button type="submit" class="button normal" id="submitBtnSettings" style="padding-right: 16px; padding-left:16px;" >
-                            <span>Submit</span>
-                        </button>
-                    </div>
-                    <div class="row">
-                        <p>API Key</p>
-                        <input type="text" id="apiKey" />
-                    </div>
-                    <div class="row">
-                        <p>API URL</p>
-                        <input type="text" id="apiUrl" />
-                    </div>
-                </form>
-                <form class="form" id="settingsForm">
-                    <div style=" width: 100%;display: flex; align-items: center;justify-content: space-between;gap: 4px;margin-bottom: 20px;">
-                        <h2>Settings</h2>
-                        <button type="submit" class="button normal" id="submitBtnSettings" style="padding-right: 16px; padding-left:16px;" >
-                            <span>Submit</span>
-                        </button>
-                    </div>
-                    <div class="row">
-                        <p>API Key</p>
-                        <input type="text" id="apiKey" />
-                    </div>
-                    <div class="row">
-                        <p>API URL</p>
-                        <input type="text" id="apiUrl" />
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <div id="myModal" class="modal">
         <div class="modal-content">
             <div class="row" style="display: flex; flex:1; justify-content:space-between; width:100%; align-items:center">
