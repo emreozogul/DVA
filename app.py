@@ -5,7 +5,7 @@ import os
 import wx
 import pandas as pd
 from prework.imageProcessing import process_image_4x, process_image_10x
-from prework.model import predict_target , get_latest_csv_file
+from prework.model import predict_target , get_latest_csv_file ,train_model , load_model
 db = DatabaseSingleton()
 conn = db.get_connection()
 c = conn.cursor()
@@ -81,7 +81,8 @@ def import_images(project_name, cell_name,  image_paths, scaleValues):
 
         X = [[area_mm2, perimeter_mm, diameter_mm, roundness, aspect_ratio, solidity, convexity,
              particle_count]]
-        viability = predict_target(X)
+        model , scaler = load_model()
+        viability = predict_target(X, model , scaler)
         
         ops.create_cell_phase(id, phase_number, area_mm2, perimeter_mm, diameter_mm, roundness,aspect_ratio, solidity, convexity, particle_count, scaleValue, viability)
         conn.commit()
@@ -153,6 +154,23 @@ def export_data(project_name):
     
     dlg.Destroy() 
     return result
+
+@eel.expose
+def reset_model_data():
+    try:
+        os.remove("prework/data/modelData.csv")
+        backup = pd.read_csv("prework/data/backup.csv")
+        backup.to_csv("prework/data/modelData.csv", index=False)
+        os.remove("prework/models/best_rf_model.pkl")
+        os.remove("prework/models/min_max_scaler.pkl")
+        train_model()
+        return True
+    except :
+        return False
+@eel.expose 
+def train_new_model():
+    train_model()
+    return "Model trained successfully."
 
 if __name__ == '__main__':
     eel.init('web')  

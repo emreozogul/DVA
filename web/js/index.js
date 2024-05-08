@@ -140,9 +140,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   var modal = document.getElementById("myModal");
-  var btn = document.getElementById("HelpNav");
+  var helpBtn = document.getElementById("HelpNav");
   var span = document.getElementsByClassName("close")[0];
-  btn.onclick = function () {
+  helpBtn.onclick = function () {
     modal.style.display = "block";
     var helpContent = `<div style="display:flex; flex-direction:column; gap:8px; font-weight:bold; padding:6px;">
     <p><strong>1. Import:</strong> Import cells into selected projects for viability analysis. Afterwards, you can add new cells to the model to achieve higher accuracy.</p>
@@ -152,6 +152,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 </div>`;
     openModal('Help', helpContent, 'plain');
   }
+  var resetBtn = document.getElementById("ResetNav");
+  resetBtn.onclick = function () {
+    var resetContent = `<div style="display:flex; flex-direction:column; gap:8px; font-weight:bold; padding:6px;">
+    <p>Are you sure you want to reset the model to the base model?</p>
+    <div style="display:flex; gap:8px; margin-top:6px; flex:1; justify-content:end;">
+      <button id="resetModelBtn" class="button normal" style="font-weight:400; font-size:medium;">Reset</button>
+      <button id="cancelResetBtn" class="button normal" style="font-weight:400; font-size:medium; ">Cancel</button>
+    </div>
+    <div id="spinner" style="display:none;" class="loader"></div>
+  </div>`;
+
+    openModal('Reset Model', resetContent, 'error');
+
+    setTimeout(() => {
+      document.getElementById('resetModelBtn').addEventListener('click', async function () {
+        document.getElementById('spinner').style.display = 'block';
+
+        try {
+          var res = await eel.reset_model_data()();
+
+          document.getElementById('spinner').style.display = 'none';
+
+          if (res) {
+            openModal('Reset Model', 'Model reset successfully.', 'success');
+          } else {
+            openModal('Reset Model', 'Failed to reset model.', 'error');
+          }
+        } catch (error) {
+          document.getElementById('spinner').style.display = 'none';
+          openModal('Reset Model', 'Error resetting model.', 'error');
+        }
+      });
+
+      document.getElementById('cancelResetBtn').addEventListener('click', function () {
+        clearModal();
+        modal.style.display = "none";
+      });
+    }, 100);
+  }
+
+
   span.onclick = function () {
     modal.style.display = "none";
     clearModal();
@@ -331,69 +372,69 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   function showResults(res) {
-    try {
-      var container = document.getElementById("import-result-container");
-      container.innerHTML = ''; // Clear previous results
-      if (Array.isArray(res)) {
-        res.forEach((phase, index) => {
-          const card = document.createElement("div");
-          card.className = "import-result-card";
+    var container = document.getElementById("import-result-container");
+    container.innerHTML = ''; // Clear previous results
 
-          function formatNumber(value) {
-            return value !== undefined && value !== null ? value.toFixed(2) : 'N/A';
-          }
-          const cardHTML = `
-                    <div class="header">
-                        <h2>Results of Phase ${phase.phaseNo}</h1>
-                        <p>${phase.viability !== undefined ? phase.viability : 'Unknown Viability'}</h2>
-                    </div>
-                    <div class="footer">
-                      <div class = "result-actions">
-                        <button id="viewResults-${index}" class="result-action">View Results</button>
-                        <button id="addToModel-${index}" class="result-action">Add to the Model</button>
-                      </div>
-                    </div>
-                `;
-          card.innerHTML = cardHTML;
-          container.appendChild(card);
-          var roundness = phase.roundness * 100;
-          document.getElementById(`viewResults-${index}`).addEventListener('click', () => {
-            const viewResultContent = `
-                        <div style="display:flex; flex-direction:column; gap:6px; font-weight:bold;">
-                            <p><strong>Area:</strong> ${formatNumber(phase.area)} mm²</p>
-                            <p><strong>Perimeter:</strong> ${formatNumber(phase.perimeter)} mm</p>
-                            <p><strong>Diameter:</strong> ${formatNumber(phase.diameter)} mm</p>
-                            <p><strong>Roundness:</strong> ${formatNumber(roundness)}</p>
-                            <p><strong>Aspect Ratio:</strong> ${formatNumber(phase.aspectRatio)}</p>
-                            <p><strong>Solidity:</strong> ${formatNumber(phase.solidity)}</p>
-                            <p><strong>Convexity:</strong> ${formatNumber(phase.convexity)}</p>
-                            <p><strong>Particles:</strong> ${phase.particles !== undefined ? phase.particles : 'N/A'}</p>
-                            <p><strong>Scale:</strong> ${phase.scale !== undefined ? phase.scale : 'N/A'}</p>
-                        </div>`;
-            openModal('View Results', viewResultContent, 'plain');
-          });
-          document.getElementById(`addToModel-${index}`).addEventListener('click', function firstClickHandler(event) {
-            var button = event.target;
+    if (Array.isArray(res)) {
+      res.forEach((phase, index) => {
+        const card = document.createElement("div");
+        card.className = "import-result-card";
 
-            eel.add_to_model_data(phase)((response) => {
-              openModal('Add to the Model', response, 'success');
-              button.textContent = 'Added';
-              button.style.backgroundColor = 'green';
-              button.removeEventListener('click', firstClickHandler);
-              button.addEventListener('click', function subsequentClickHandler() {
-                openModal('Error', 'You cannot add anymore', 'error');
-              });
+        function formatNumber(value) {
+          return value !== undefined && value !== null ? value.toFixed(2) : 'N/A';
+        }
+        const cardHTML = `<div class="header">
+            <h2>Results of Phase ${phase.phaseNo}</h1>
+            <p>${phase.viability !== undefined ? phase.viability : 'Unknown Viability'}</h2>
+        </div>
+        <div class="footer">
+          <div class = "result-actions">
+            <button id="viewResults-${index}" class="result-action">View Results</button>
+            <button id="addToModel-${index}" class="result-action">Add to the Model</button>
+          </div>
+        </div>`;
+        card.innerHTML = cardHTML;
+        container.appendChild(card);
+        var roundness = phase.roundness * 100;
+        document.getElementById(`viewResults-${index}`).addEventListener('click', () => {
+          const viewResultContent = `
+                      <div style="display:flex; flex-direction:column; gap:6px; font-weight:bold;">
+                          <p><strong>Area:</strong> ${formatNumber(phase.area)} mm²</p>
+                          <p><strong>Perimeter:</strong> ${formatNumber(phase.perimeter)} mm</p>
+                          <p><strong>Diameter:</strong> ${formatNumber(phase.diameter)} mm</p>
+                          <p><strong>Roundness:</strong> ${formatNumber(roundness)}</p>
+                          <p><strong>Aspect Ratio:</strong> ${formatNumber(phase.aspectRatio)}</p>
+                          <p><strong>Solidity:</strong> ${formatNumber(phase.solidity)}</p>
+                          <p><strong>Convexity:</strong> ${formatNumber(phase.convexity)}</p>
+                          <p><strong>Particles:</strong> ${phase.particles !== undefined ? phase.particles : 'N/A'}</p>
+                          <p><strong>Scale:</strong> ${phase.scale !== undefined ? phase.scale : 'N/A'}</p>
+                      </div>`;
+          openModal('View Results', viewResultContent, 'plain');
+        });
+
+        document.getElementById(`addToModel-${index}`).addEventListener('click', function (event) {
+          var button = event.target;
+          button.innerHTML = '<div class="inline-loader"></div>'; // Show spinner inside button
+          button.disabled = true; // Disable the button to prevent multiple clicks
+
+          eel.train_new_model()(); // Start training the model
+          eel.add_to_model_data(phase)((response) => {
+            button.innerHTML = 'Added'; // Change button text to 'Added'
+            button.style.backgroundColor = 'green'; // Change button color to green
+            button.removeEventListener('click', this);
+            button.addEventListener('click', function () {
+              openModal('Error', 'You cannot add anymore', 'error');
             });
           });
-
         });
-      } else {
-        console.error('Expected an array for response, received:', res);
-      }
-    } catch (error) {
-      console.error('Failed to fetch result data:', error);
+      });
+    } else {
+      console.error('Expected an array for response, received:', res);
     }
   }
+
+
+
 });
 
 
@@ -424,6 +465,9 @@ function updateProjectList() {
     </div>`;
     projectList.appendChild(projectItem);
     projectSelect.innerHTML += `<option value="${projects[i].name}">${projects[i].name}</option>`;
+  }
+  if (projects.length === 0) {
+    projectList.innerHTML = '<p style="text-align:center; color:#555555; font-weight:bold;">No projects available.</p>';
   }
 }
 
