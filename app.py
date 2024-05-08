@@ -93,22 +93,43 @@ def import_images(project_name, cell_name,  image_paths, scaleValues):
 @eel.expose
 def add_to_model_data(phase_data):
     latest_csv_file = get_latest_csv_file()
-
     full_csv_path = os.path.join(latest_csv_file) if latest_csv_file else None
 
-    if full_csv_path and os.path.exists(full_csv_path):
-        data = pd.read_csv(full_csv_path)
-    else:
-        data = pd.DataFrame()
-        
-    if not isinstance(phase_data, pd.DataFrame):
-        phase_data = pd.DataFrame([phase_data])
+    if not full_csv_path or not os.path.exists(full_csv_path):
+        return "Error : No CSV file found."
 
-    data = pd.concat([data, phase_data], ignore_index=True)
+    existing_data = pd.read_csv(full_csv_path)
+
+    columns = existing_data.columns.tolist()
+
+    if isinstance(phase_data, dict) and 'cellName' in phase_data:
+        
+        new_record = {col: None for col in columns}
+
+        # Match the keys in the phase_data with the columns in the new_record
+        new_record['Image_Name'] = phase_data.get('cellName', None)
+        new_record['Area_mm2'] = phase_data.get('area', None)
+        new_record['Perimeter_mm'] = phase_data.get('perimeter', None)
+        new_record['Diameter_mm'] = phase_data.get('diameter', None)
+        new_record['Roundness'] = phase_data.get('roundness', None)
+        new_record['Aspect_Ratio'] = phase_data.get('aspectRatio', None)
+        new_record['Solidity'] = phase_data.get('solidity', None)
+        new_record['Convexity'] = phase_data.get('convexity', None)
+        new_record['Particle_Count'] = phase_data.get('particles', None)
+        new_record['Target'] = phase_data.get('viability', None)
+
+        # Add new data to existing data
+        new_data_df = pd.DataFrame([new_record], columns=columns)
+
+    else:
+        return "Error : Data is not in the correct format."
+
+    # Add new data to existing data
+    updated_data = pd.concat([existing_data, new_data_df], ignore_index=True)
+    updated_data.to_csv(full_csv_path, index=False)
     
-    data.to_csv(full_csv_path, index=False)
-    
-    return "Data added to model successfully."
+    return "Data added succesfully."
+
 
 @eel.expose
 def get_cells_by_project_name(project_name):
