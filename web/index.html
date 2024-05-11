@@ -15,60 +15,134 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var cropper;
-            document.getElementById('inputImage').addEventListener('change', function(event) {
-                const files = event.target.files;
+            var imgContainer = document.querySelector('.img-container');
+            var imgContainerMock = document.querySelector('.img-container-mock');
+            var inputImage = document.getElementById('inputImage');
+        
+            imgContainer.addEventListener('dragover', function (event) {
+                event.preventDefault(); 
+                imgContainer.classList.add('drag-over');
+            });
+        
+            imgContainer.addEventListener('dragenter', function (event) {
+                event.preventDefault();
+                imgContainer.classList.add('drag-over');
+            });
+            imgContainer.addEventListener('dragleave', function (event) {
+                imgContainer.classList.remove('drag-over');
+            });
+        
+            imgContainer.addEventListener('drop', function (event) {
+                event.preventDefault();
+                imgContainer.classList.remove('drag-over');
+                const files = event.dataTransfer.files; // Get the files from the event
+                handleFiles(files); // Handle the files
+            });
+            imgContainer.addEventListener("mouseover", function() {
+                imgContainer.classList.add('mouse-over');
+            });
+            imgContainer.addEventListener("mouseout", function() {
+                imgContainer.classList.remove('mouse-over');
+            });
+
+            imgContainerMock.addEventListener('mouseover', function() {
+                imgContainerMock.classList.add('mouse-over');
+            });
+            imgContainerMock.addEventListener('mouseout', function() {
+                imgContainerMock.classList.remove('mouse-over');
+            });
+
+            imgContainerMock.addEventListener('dragover', function (event) {
+                event.preventDefault(); // Prevent default behavior (Prevent file from being opened)
+                imgContainerMock.classList.add('drag-over');
+            });
+
+            imgContainerMock.addEventListener('dragenter', function (event) {
+                event.preventDefault();
+                imgContainerMock.classList.add('drag-over');
+            });
+
+            imgContainerMock.addEventListener('dragleave', function (event) {
+                imgContainerMock.classList.remove('drag-over');
+            });
+
+            imgContainerMock.addEventListener('drop', function (event) {
+                event.preventDefault();
+                imgContainerMock.classList.remove('drag-over');
+                const files = event.dataTransfer.files; // Get the files from the event
+                handleFiles(files); // Handle the files
+            });
+            function handleFiles(files) {
                 if (files && files.length > 0) {
                     const file = files[0];
-            
-                    if (/\.tif$|\.tiff$/i.test(file.name)) {
-                        // Handle TIFF file
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const buffer = e.target.result;
-                            const tiff = new Tiff({buffer: buffer});
-                            const canvas = tiff.toCanvas();
-                            canvas.id = "image";
-                            // set max width and height as 800px
-                            
-                            const imgContainer = document.querySelector('.img-container');
-                            const imgContainerMock = document.querySelector('.img-container-mock');
-                            imgContainer.style.display = "block";
-                            imgContainerMock.style.display = "none";
-                            imgContainer.innerHTML = ""; // Clear the container
-                            imgContainer.appendChild(canvas);
-
-            
-                            // Initialize Cropper on the new canvas
-                            if (cropper) {
-                                cropper.destroy();
-                            }
-                            cropper = new Cropper(canvas, {
-                                aspectRatio: 1 / 1,
-                                background: false,
-                                highlight: false,
-                            });
-                        };
-                        reader.readAsArrayBuffer(file);
-                    } else {
-                        // Handle other file types as before
-                    }
+                    loadImage(file);
+                    imgContainerMock.style.display = "none";
                 }
+            }
+            inputImage.addEventListener('change', function(event) {
+                const files = event.target.files;
+                handleFiles(files);
             });
+        
+            function loadImage(file) {
+                if (/\.tif$|\.tiff$/i.test(file.name)) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const buffer = e.target.result;
+                        const tiff = new Tiff({buffer: buffer});
+                        const canvas = tiff.toCanvas();
+                        canvas.id = "image";
+        
+                        imgContainer.style.display = "block";
+                        imgContainer.innerHTML = ""; 
+                        imgContainer.appendChild(canvas);
+        
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+                        cropper = new Cropper(canvas, {
+                            aspectRatio: 1 / 1,
+                            background: false,
+                            highlight: false,
+                        });
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    openModal("Error", "Please select a TIFF file.", "error");
+                }
+            }
             
             document.getElementById('rotateLeft').addEventListener('click', function () {
-            cropper.rotate(-45);
+                cropper.rotate(-45);
             });
         
             document.getElementById('rotateRight').addEventListener('click', function () {
-            cropper.rotate(45);
+                cropper.rotate(45);
             });
         
             document.getElementById('zoomIn').addEventListener('click', function () {
-            cropper.zoom(0.1);
+                cropper.zoom(0.1);
             });
         
             document.getElementById('zoomOut').addEventListener('click', function () {
-            cropper.zoom(-0.1);
+                cropper.zoom(-0.1);
+            });
+            document.getElementById('moveLeft').addEventListener('click', function () {
+                cropper.move(-10, 0);
+            });
+            document.getElementById('moveRight').addEventListener('click', function () {
+                cropper.move(10, 0);
+            });
+            document.getElementById('moveUp').addEventListener('click', function () {
+                cropper.move(0, -10);
+            });
+            document.getElementById('moveDown').addEventListener('click', function () {
+                cropper.move(0, 10);
+            });
+            document.getElementById('clearCanvas').addEventListener('click', function () {
+                imgContainer.innerHTML = "";
+                imgContainer.style.display = "none";
+                imgContainerMock.style.display = "flex";
             });
             
             document.getElementById('crop').addEventListener('click', function() {
@@ -90,8 +164,11 @@
             document.getElementById('select').addEventListener('click', function () {
             document.getElementById('inputImage').click();
             });
-            
+            document.getElementsByClassName("img-container-mock")[0].addEventListener("click", function() {
+                document.getElementById('inputImage').click();
+            });
         });
+        
         
         $(window).resize(function() {
             var minWidth = 800;
@@ -290,8 +367,7 @@
         <div class="toolbox">
             <input type="file" id="inputImage" accept="image/*" style="display: none;">
             <button id="select" style="display: flex; gap: 4px; align-items:center;">
-                <span  style="font-size: 18px;" >Open</span>
-                <svg width="26px" height="26px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.7955 15.8111L21 21M18 10.5C18 14.6421 14.6421 18 10.5 18C6.35786 18 3 14.6421 3 10.5C3 6.35786 6.35786 3 10.5 3C14.6421 3 18 6.35786 18 10.5Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                <span  style="font-size: 18px;" >Select</span>
             </button>
             <button id="rotateLeft">
                 <svg width="26px" height="26px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" transform="matrix(-1, 0, 0, 1, 0, 0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M11.5 20.5C6.80558 20.5 3 16.6944 3 12C3 7.30558 6.80558 3.5 11.5 3.5C16.1944 3.5 20 7.30558 20 12C20 13.5433 19.5887 14.9905 18.8698 16.238M22.5 15L18.8698 16.238M17.1747 12.3832L18.5289 16.3542L18.8698 16.238" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
@@ -305,13 +381,28 @@
             <button id="zoomOut">
                 <svg width="26px" height="26px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>zoom-out</title> <desc>Created with Sketch Beta.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> <g id="Icon-Set" sketch:type="MSLayerGroup" transform="translate(-360.000000, -1139.000000)" fill="#ffffff"> <path d="M373.46,1163.45 C367.17,1163.45 362.071,1158.44 362.071,1152.25 C362.071,1146.06 367.17,1141.04 373.46,1141.04 C379.75,1141.04 384.85,1146.06 384.85,1152.25 C384.85,1158.44 379.75,1163.45 373.46,1163.45 L373.46,1163.45 Z M391.688,1169.25 L383.429,1161.12 C385.592,1158.77 386.92,1155.67 386.92,1152.25 C386.92,1144.93 380.894,1139 373.46,1139 C366.026,1139 360,1144.93 360,1152.25 C360,1159.56 366.026,1165.49 373.46,1165.49 C376.672,1165.49 379.618,1164.38 381.932,1162.53 L390.225,1170.69 C390.629,1171.09 391.284,1171.09 391.688,1170.69 C392.093,1170.3 392.093,1169.65 391.688,1169.25 L391.688,1169.25 Z M378.689,1151.41 L368.643,1151.41 C368.102,1151.41 367.663,1151.84 367.663,1152.37 C367.663,1152.9 368.102,1153.33 368.643,1153.33 L378.689,1153.33 C379.23,1153.33 379.669,1152.9 379.669,1152.37 C379.669,1151.84 379.23,1151.41 378.689,1151.41 L378.689,1151.41 Z" id="zoom-out" sketch:type="MSShapeGroup"> </path> </g> </g> </g></svg>
             </button>
+            <button id="moveLeft">
+                <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 6L9 12L15 18" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>            </button>
+            <button id="moveRight">
+                <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 6L15 12L9 18" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>            </button>
+            <button id="moveUp">
+                <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 15L12 9L18 15" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>            </button>
+            <button id="moveDown">
+                <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 9L12 15L18 9" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+            </button>
             <button id="crop" style="display: flex; gap: 4px; align-items:center;">
                 <span  style="font-size: 18px;" >Crop</span>
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 3V14.8C6 15.9201 6 16.4802 6.21799 16.908C6.40973 17.2843 6.71569 17.5903 7.09202 17.782C7.51984 18 8.0799 18 9.2 18H15M21 18H18M18 21V9.2C18 8.0799 18 7.51984 17.782 7.09202C17.5903 6.71569 17.2843 6.40973 16.908 6.21799C16.4802 6 15.9201 6 14.8 6H9M3 6H6" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+            </button>
+            <button id="clearCanvas" style="display: flex; gap: 4px; align-items:center;">
+                <span  style="font-size: 18px;" >Clear</span>
             </button>
         </div>
         <div class="img-container-mock">
-            <h2>Import an image to start cropping</h2>
+            <h2>Drag and drop an image here</h2>
+            <h2>or</h2>
+            <h2>Click <span style="color: yellow;">select</span> to upload image</h2>
+            <br>
+            <p style="font-weight:bold; font-size:medium;">(Supported file types: TIFF)</p>
         </div>
         <div class="img-container" style="display: none;">
         </div>

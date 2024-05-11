@@ -11,19 +11,10 @@ ModuleNotFoundError: No module named 'bottle.ext.websocket'
 pip install git+https://github.com/bottlepy/bottle.git
 
 TO_DO:
-- image processing pipeline güncellenmesi lazım.
-- model ile image processing pipeline bağlantılı olarak çalışması lazım, bunun için 
-        + image processing pipeline'dan çıkan csv dosyası decision tree modelinde çalışmaya uyumlu olması lazım
-        + aynı zamanda model script'i içerisinde X ve y için csv'den doğru değerler seçilmesi lazım. (fotoğraf adı, target etc.) 
-- image processing sonrası çıkan csv kontrol edilmeli aynı fotoğraf için birden fazla row çıkartıyor en büyük olanı tek olarak çıkartması lazım.
+
 Front: 
--import sayfasında submit edildiği zaman image processing pipeline ardından ml çalıştırılmasının bağlanması lazım
 - project sayfasında proje olmadığı zaman label olması lazım
-- landing page 
--result page lazım import arkası
--overview page lazım
-Backend :
-- model bağlanması lazım 
+
 
 Referans : 
 -tiff.js canvastotiff.js

@@ -169,8 +169,8 @@ def reset_model_data():
         return False
 @eel.expose 
 def train_new_model():
-    train_model()
-    return "Model trained successfully."
+    _ , _1 , data=  train_model()
+    return data
 
 if __name__ == '__main__':
     eel.init('web')  

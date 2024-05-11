@@ -460,7 +460,6 @@ a:hover {
 .import-result-card .header {
     display: flex;
     width: 100%;
-    flex: 1;
     flex-direction: column;
 }
 
@@ -880,6 +879,11 @@ tbody tr:hover {
     width: 100%;
     margin-bottom: 20px;
     max-height: 600px;
+    height: 100%;
+    border: 2px dashed #ccc;
+    opacity: 0.95;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
+        -5px -5px 10px rgba(255, 255, 255, 0.5);
 }
 
 .img-container-mock {
@@ -888,14 +892,26 @@ tbody tr:hover {
     max-height: 600px;
     height: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    background-color: #444;
+    color: white;
+    border: 2px dashed #ccc;
+    opacity: 0.95;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
         -5px -5px 10px rgba(255, 255, 255, 0.5);
 
+}
+
+.drag-over {
+    border: 2px dashed #111;
+    opacity: 1;
+}
+
+.mouse-over {
+    border: 2px dashed #111;
+    opacity: 1;
 }
 
 .hidden {
@@ -925,7 +941,7 @@ tbody tr:hover {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    background-color: #ba2626;
+    background-color: #b53851;
     color: white;
     border: none;
     border-radius: 4px;

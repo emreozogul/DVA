@@ -230,8 +230,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="phase-image-upload-button" data-label-id="image-path-1">Phase 1</div>
             <div class="import-custom-select">
               <select class="scale-select">
-                  <option value="4x">4x</option>
                   <option value="10x">10x</option>
+                  <option value="4x">4x</option>
                 </select>
             </div>
           </div>
@@ -244,8 +244,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="phase-image-upload-button" data-label-id="image-path-2">Phase 2</div>
             <div class="import-custom-select">
               <select class="scale-select">
-                  <option value="4x">4x</option>
                   <option value="10x">10x</option>
+                  <option value="4x">4x</option>
                 </select>
             </div>
           </div>
@@ -285,8 +285,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="phase-image-upload-button" data-label-id="image-path-1">Phase 1</div>
             <div class="import-custom-select">
               <select class="scale-select">
-                  <option value="4x">4x</option>
                   <option value="10x">10x</option>
+                  <option value="4x">4x</option>
                 </select>
             </div>
           </div>
@@ -299,8 +299,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="phase-image-upload-button" data-label-id="image-path-2">Phase 2</div>
             <div class="import-custom-select">
               <select class="scale-select">
-                  <option value="4x">4x</option>
                   <option value="10x">10x</option>
+                  <option value="4x">4x</option>
                 </select>
             </div>
           </div>
@@ -313,8 +313,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="phase-image-upload-button" data-label-id="image-path-3">Phase 3</div>
             <div class="import-custom-select">
               <select class="scale-select">
-                  <option value="4x">4x</option>
                   <option value="10x">10x</option>
+                  <option value="4x">4x</option>
                 </select>
             </div>
           </div>
@@ -375,6 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     var container = document.getElementById("import-result-container");
     container.innerHTML = ''; // Clear previous results
 
+
     if (Array.isArray(res)) {
       res.forEach((phase, index) => {
         const card = document.createElement("div");
@@ -384,8 +385,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           return value !== undefined && value !== null ? value.toFixed(2) : 'N/A';
         }
         const cardHTML = `<div class="header">
-            <h2>Results of Phase ${phase.phaseNo}</h1>
-            <p>${phase.viability !== undefined ? phase.viability : 'Unknown Viability'}</h2>
+            <h3>Results of Phase ${phase.phaseNo}</h3>
+            <div class="separator"></div>
+            <div style="display:flex; gap:8px; margin-top:6px; padding:6px; border-radius:6px; color:#3857b5;">
+              <h2>${phase.viability !== undefined ? phase.viability : 'Unknown Viability'}</h2>
+            </div>
         </div>
         <div class="footer">
           <div class = "result-actions">
@@ -396,7 +400,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.innerHTML = cardHTML;
         container.appendChild(card);
         var roundness = phase.roundness * 100;
-        document.getElementById(`viewResults-${index}`).addEventListener('click', () => {
+        document.getElementById(`viewResults-${index}`).addEventListener('click', async () => {
           const viewResultContent = `
                       <div style="display:flex; flex-direction:column; gap:6px; font-weight:bold;">
                           <p><strong>Area:</strong> ${formatNumber(phase.area)} mm²</p>
@@ -411,31 +415,63 @@ document.addEventListener('DOMContentLoaded', async () => {
                       </div>`;
           openModal('View Results', viewResultContent, 'plain');
         });
+        var addingToModelFlags = {};
+
+        function disableAllButtons() {
+          const buttons = document.querySelectorAll('[id^="addToModel-"]');
+          buttons.forEach(btn => {
+            btn.disabled = true;
+          });
+        }
+        function enableAllButtons() {
+          const buttons = document.querySelectorAll('[id^="addToModel-"]');
+          buttons.forEach(btn => {
+            btn.disabled = false;
+          });
+        }
+        async function addToModelHandler(event, index, phase) {
+          if (addingToModelFlags[index]) {
+            return;
+          }
+          addingToModelFlags[index] = true;
+          var button = event.target;
+          button.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; gap:4px; font-size:small; font-weight:bold;">
+            <div class="inline-loader"></div>
+            <p>Training...</p>
+          </div>`;
+          disableAllButtons();
+
+          var res = await eel.train_new_model()();
+          console.log(res);
+          await eel.add_to_model_data(phase)();
+          button.innerHTML = 'Added';
+          button.style.backgroundColor = 'green';
+          button.onclick = function () {
+            openModal('Error', 'You cannot add anymore', 'error');
+          };
+          enableAllButtons();
+          var accuracy = (res.accuracy * 100).toFixed(2) || 'N/A';
+          var precision = (res.precision * 100).toFixed(2) || 'N/A';
+          var innerHTML = `<div style="display:flex; flex-direction:column; gap:6px; font-weight:bold;">
+            <p> Model trained successfully.</p>
+            <p>Training accuracy is now ${accuracy}%</p>
+            <p> Training precision is now ${precision}%</p>
+          </div>`;
+          openModal('Model Training Success', innerHTML, 'success');
+        }
 
         document.getElementById(`addToModel-${index}`).addEventListener('click', function (event) {
-          var button = event.target;
-          button.innerHTML = '<div class="inline-loader"></div>'; // Show spinner inside button
-          button.disabled = true; // Disable the button to prevent multiple clicks
-
-          eel.train_new_model()(); // Start training the model
-          eel.add_to_model_data(phase)((response) => {
-            button.innerHTML = 'Added'; // Change button text to 'Added'
-            button.style.backgroundColor = 'green'; // Change button color to green
-            button.removeEventListener('click', this);
-            button.addEventListener('click', function () {
-              openModal('Error', 'You cannot add anymore', 'error');
-            });
-          });
+          addToModelHandler(event, index, phase);
         });
+
       });
     } else {
       console.error('Expected an array for response, received:', res);
     }
   }
 
-
-
 });
+
 
 
 function updateProjectList() {
@@ -616,7 +652,7 @@ function openModal(title, content, type) {
     modalBody.style.color = 'green';
   }
   else if (type === 'error') {
-    modalBody.style.color = 'red';
+    modalBody.style.color = '#b53851';
   } else if (type === 'plain') {
     modalBody.style.color = 'black';
   }

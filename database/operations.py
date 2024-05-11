@@ -29,6 +29,13 @@ class DatabaseOperations:
     def delete_project(self, project_name):
         conn = self.db.get_connection()
         cursor = conn.cursor()
+        cursor.execute("SELECT cell_id FROM cells WHERE projectName = ?", (project_name,))
+        cells = cursor.fetchall()
+        for cell in cells:
+            cursor.execute("DELETE FROM cellPhases WHERE cell_id = ?", (cell[0],))
+            conn.commit()
+        cursor.execute("DELETE FROM cells WHERE projectName = ?", (project_name,))
+        conn.commit()
         cursor.execute("DELETE FROM projects WHERE name = ?", (project_name,))
         conn.commit()
 

@@ -120,9 +120,11 @@ def train_model():
     
     joblib.dump(best_rf_model, os.path.join('prework', 'models', 'best_rf_model.pkl'))
     joblib.dump(min_max_scaler, os.path.join('prework', 'models', 'min_max_scaler.pkl')) 
-    
-    return best_rf_model, min_max_scaler
-
+    json_data = {
+        "accuracy": accuracy_rf,
+        "precision": precision_rf,
+    }
+    return best_rf_model, min_max_scaler , json_data
 
 def load_model():
     best_rf_model = joblib.load(os.path.join('prework', 'models', 'best_rf_model.pkl'))
