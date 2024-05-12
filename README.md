@@ -42,8 +42,11 @@ Eel, OpenCV, Sklearn, Wx, Pandas, NumPy
 
 ### JS Scripts
 Tiff.js - https://github.com/seikichi/tiff.js
+
 Canvastotiff.js - https://github.com/motiz88/canvas-to-tiff
+
 Cropper.js - https://github.com/fengyuanchen/cropperjs
+
 JQuery
 
 ## Authors and Acknowledgement
