@@ -38,7 +38,9 @@ python app.py
 
 ### Python
 
-Eel, OpenCV, Sklearn, Wx, Pandas, NumPy 
+Eel - https://github.com/python-eel/Eel
+
+OpenCV, Sklearn, Wx, Pandas, NumPy 
 
 ### JS Scripts
 Tiff.js - https://github.com/seikichi/tiff.js
