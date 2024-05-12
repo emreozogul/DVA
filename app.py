@@ -107,7 +107,6 @@ def add_to_model_data(phase_data):
         
         new_record = {col: None for col in columns}
 
-        # Match the keys in the phase_data with the columns in the new_record
         new_record['Image_Name'] = phase_data.get('cellName', None)
         new_record['Area_mm2'] = phase_data.get('area', None)
         new_record['Perimeter_mm'] = phase_data.get('perimeter', None)
@@ -119,13 +118,11 @@ def add_to_model_data(phase_data):
         new_record['Particle_Count'] = phase_data.get('particles', None)
         new_record['Target'] = phase_data.get('viability', None)
 
-        # Add new data to existing data
         new_data_df = pd.DataFrame([new_record], columns=columns)
 
     else:
         return "Error : Data is not in the correct format."
 
-    # Add new data to existing data
     updated_data = pd.concat([existing_data, new_data_df], ignore_index=True)
     updated_data.to_csv(full_csv_path, index=False)
     

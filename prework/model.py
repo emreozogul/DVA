@@ -110,13 +110,7 @@ def train_model():
     recall_rf = recall_score(y_test, y_pred_rf, average='weighted')
     
     f1_rf = f1_score(y_test, y_pred_rf, average='weighted')
-    
-    print("Performance of Random Forest:")
-    print(f"Cross-Validation Accuracy: {average_cv_score:.4f}")
-    print(f"Test Accuracy: {accuracy_rf:.4f}")
-    print(f"Precision: {precision_rf:.4f}")
-    print(f"Recall: {recall_rf:.4f}")
-    print(f"F1 Score: {f1_rf:.4f}")
+
     
     joblib.dump(best_rf_model, os.path.join('prework', 'models', 'best_rf_model.pkl'))
     joblib.dump(min_max_scaler, os.path.join('prework', 'models', 'min_max_scaler.pkl')) 
