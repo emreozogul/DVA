@@ -11,14 +11,43 @@ This project, DVA, develops a desktop application to classify drug-treated cance
 
 ## Installation
 
-Clone the repository and install the required packages:
+Clone the repository:
 
 ```bash
 git clone https://github.com/emreozogul/DVA.git
 cd DVA
 pip install -r requirements.txt
 ```
+Install the required packages:
 
+```bash
+pip install -r requirements.txt
+```
+or :
+
+```bash
+pip install eel opencv-python scikit-learn wxPython pandas numpy 
+```
+
+Run the application with:
+
+```python
+python app.py
+```
+## Libraries
+
+### Python
+
+Eel, OpenCV, Sklearn, Wx, Pandas, NumPy 
+
+### JS Scripts
+Tiff.js - https://github.com/seikichi/tiff.js
+
+Canvastotiff.js - https://github.com/motiz88/canvas-to-tiff
+
+Cropper.js - https://github.com/fengyuanchen/cropperjs
+
+JQuery
 
 ## Authors and Acknowledgement
 - Emre Evcin
